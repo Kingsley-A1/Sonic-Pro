@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KING SON♪C Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- PWA Manifest & Meta Tags -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#ff6b35" />
+  <meta name="description" content="KING SON♪C Pro - A premium web synthesizer and piano application" />
+
+  <!-- iOS PWA Support -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SonicPro" />
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-96x96.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-72x72.png" />
+</head>
+
+<body data-theme="orange">
+  <!-- Mandatory Landscape Overlay - Blocks portrait mode on mobile -->
+  <div id="rotate-overlay" class="rotate-overlay" role="dialog" aria-modal="true"
+    aria-label="Please rotate your device">
+    <div class="msg">
+      <strong>🎹 Rotate Your Device</strong><br><br>
+      KING SON♪C Pro requires landscape orientation for the best piano experience.
+    </div>
+  </div>
+  <div class="app-container">
+    <header class="synth-header">
+      <div class="logo-container">
+        <h1 class="brand-name">KING SON♪C <span class="accent">Pro</span></h1>
+      </div>
+
+      <div class="theme-selector">
+        <label>Theme:</label>
+        <div class="theme-dots">
+          <button class="dot orange active" onclick="setTheme('orange')"></button>
+          <button class="dot purple" onclick="setTheme('purple')"></button>
+          <button class="dot red" onclick="setTheme('red')"></button>
+          <button class="dot black" onclick="setTheme('black')"></button>
+        </div>
+      </div>
+    </header>
+
+    <div class="visual-dashboard">
+      <div class="viz-left">
+        <div class="pressed-key-display">
+          <div class="pressed-key-letter" id="pressed-key-letter">&nbsp;</div>
+          <div class="pressed-key-note" id="pressed-key-note">&nbsp;</div>
+        </div>
+      </div>
+      <div class="viz-center viz-container">
+        <canvas id="visualizer" width="800" height="100"></canvas>
+        <div id="viz-overlay" class="viz-overlay" aria-hidden="true" role="status" aria-live="polite">
+          <span>Welcome to</span>
+          <span>KING SON♪C Pro</span>
+        </div>
+      </div>
+      <div class="viz-right">
+        <div class="record-panel">
+          <div id="record-status">RECORD YOUR creativity!</div>
+          <div id="record-timer">00:00</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard">
+      <div class="control-group">
+        <label>Master Vol</label>
+        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" />
+      </div>
+
+      <div class="control-group">
+        <label>Tone</label>
+        <div class="toggle-switch">
+          <button class="tone-btn active" data-type="triangle">Piano</button>
+          <button class="tone-btn" data-type="sawtooth">Synth</button>
+          <button class="tone-btn" data-type="square">Square</button>
+          <button class="tone-btn" data-type="sine">Sine</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>Octave</label>
+        <div class="octave-controls">
+          <button id="octave-down" class="octave-btn">−</button>
+          <span id="octave-display">C4</span>
+          <button id="octave-up" class="octave-btn">+</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Power</label>
+        <div class="power-controls">
+          <button id="power-toggle" class="power-btn off" aria-pressed="false">
+            Off
+          </button>
+          <span id="power-indicator" class="power-indicator off" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>Record</label>
+        <div class="record-controls">
+          <button id="record-btn" class="record-btn">● Rec</button>
+          <button id="stop-btn" class="stop-btn" disabled>Stop</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="piano-wrapper">
+      <ul class="piano-keys-list" id="piano-keys">
+        <li class="key white" data-note="C" data-key="a"><span>A</span></li>
+        <li class="key black" data-note="C#" data-key="w"><span>W</span></li>
+        <li class="key white" data-note="D" data-key="s"><span>S</span></li>
+        <li class="key black" data-note="D#" data-key="e"><span>E</span></li>
+        <li class="key white" data-note="E" data-key="d"><span>D</span></li>
+        <li class="key white" data-note="F" data-key="f"><span>F</span></li>
+        <li class="key black" data-note="F#" data-key="t"><span>T</span></li>
+        <li class="key white" data-note="G" data-key="g"><span>G</span></li>
+        <li class="key black" data-note="G#" data-key="y"><span>Y</span></li>
+        <li class="key white" data-note="A" data-key="h"><span>H</span></li>
+        <li class="key black" data-note="A#" data-key="u"><span>U</span></li>
+        <li class="key white" data-note="B" data-key="j"><span>J</span></li>
+        <li class="key white" data-note="C" data-key="k" data-octave-shift="1">
+          <span>K</span>
+        </li>
+        <!-- Extra (higher) octave for extended range: octave-shift="2" -->
+        <li class="key black" data-note="C#" data-octave-shift="2" data-key="o">
+          <span>O</span>
+        </li>
+        <li class="key white" data-note="D" data-octave-shift="2" data-key="l">
+          <span>L</span>
+        </li>
+        <li class="key black" data-note="D#" data-octave-shift="2" data-key="p">
+          <span>P</span>
+        </li>
+        <li class="key white" data-note="E" data-octave-shift="2" data-key=";">
+          <span>;</span>
+        </li>
+        <li class="key white" data-note="F" data-octave-shift="2" data-key="'">
+          <span>'</span>
+        </li>
+        <li class="key black" data-note="F#" data-octave-shift="2" data-key="\\">
+          <span>\\</span>
+        </li>
+        <li class="key white" data-note="G" data-octave-shift="2" data-key="z">
+          <span>Z</span>
+        </li>
+        <li class="key black" data-note="G#" data-octave-shift="2" data-key="i">
+          <span>I</span>
+        </li>
+        <li class="key white" data-note="A" data-octave-shift="2" data-key="x">
+          <span>X</span>
+        </li>
+        <li class="key black" data-note="A#" data-octave-shift="2" data-key="m">
+          <span>M</span>
+        </li>
+        <li class="key white" data-note="B" data-octave-shift="2" data-key="c">
+          <span>C</span>
+        </li>
+        <li class="key white" data-note="C" data-octave-shift="2" data-key="v">
+          <span>V</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- First-Time User Onboarding Tour -->
+  <div id="onboarding-tour" class="onboarding-tour" aria-hidden="true">
+    <div class="tour-overlay"></div>
+    <div class="tour-spotlight" id="tour-spotlight"></div>
+    <div class="tour-pointer" id="tour-pointer">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+      </svg>
+    </div>
+    <div class="tour-tooltip" id="tour-tooltip">
+      <div class="tour-tooltip-content">
+        <h4 id="tour-title">Welcome!</h4>
+        <p id="tour-tip">Let's get you started with KING SON♪C Pro!</p>
+      </div>
+      <div class="tour-actions">
+        <button id="tour-skip" class="tour-btn-skip">Skip Tour</button>
+        <button id="tour-next" class="tour-btn-next">Next →</button>
+      </div>
+      <div class="tour-progress" id="tour-progress">Step 1 of 6</div>
+    </div>
+  </div>
+
+  <!-- Enhanced PWA Install Card - Multi-State -->
+  <div id="install-card" class="install-card" aria-hidden="true">
+    <div class="install-card-backdrop"></div>
+    <div class="install-card-content">
+      <!-- Close button -->
+      <button id="install-dismiss" class="install-card-close" aria-label="Dismiss">✕</button>
+
+      <!-- State: Prompt (default) -->
+      <div class="install-state" id="install-state-prompt">
+        <div class="install-card-icon">
+          <img src="icons/icon-96x96.png" alt="King Sonic Pro" />
+          <div class="install-icon-glow"></div>
+        </div>
+        <div class="install-card-header">
+          <h3>Install KING SON♪C Pro</h3>
+          <p>Get the full app experience with offline support!</p>
+        </div>
+        <ul class="install-features">
+          <li>🎹 Play piano anytime, anywhere</li>
+          <li>📱 Works offline</li>
+          <li>⚡ Lightning fast</li>
+        </ul>
+        <button id="install-btn" class="install-btn-primary">
+          <span class="install-btn-icon">📥</span>
+          <span>Install Now</span>
+        </button>
+      </div>
+
+      <!-- State: Installing -->
+      <div class="install-state hidden" id="install-state-installing">
+        <div class="install-progress-container">
+          <div class="install-progress-spinner"></div>
+          <div class="install-progress-bar">
+            <div class="install-progress-fill"></div>
+          </div>
+        </div>
+        <div class="install-card-header">
+          <h3>Installing...</h3>
+          <p>Setting up your premium piano experience</p>
+        </div>
+      </div>
+
+      <!-- State: Success -->
+      <div class="install-state hidden" id="install-state-success">
+        <div class="install-success-icon">
+          <svg viewBox="0 0 52 52" class="checkmark">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+          </svg>
+        </div>
+        <div class="install-card-header">
+          <h3>Installation Complete! 🎉</h3>
+          <p>KING SON♪C Pro is ready to use</p>
+        </div>
+        <button id="open-app-btn" class="install-btn-primary success">
+          <span class="install-btn-icon">🚀</span>
+          <span>Open App</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+  <!-- Service Worker & PWA Install Prompt -->
+  <script>
+    // ===========================================
+    // SERVICE WORKER REGISTRATION
+    // ===========================================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((registration) => {
+            console.log('✅ Service Worker registered successfully:', registration.scope);
+
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              console.log('🔄 New Service Worker found, installing...');
+
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('📦 New content available, please refresh!');
+                }
+              });
+            });
+          })
+          .catch((error) => {
+            console.error('❌ Service Worker registration failed:', error);
+          });
+      });
+    }
+
+    // ===========================================
+    // PWA INSTALL PROMPT - Enhanced Multi-State Install Card
+    // ===========================================
+    (function () {
+      let deferredPrompt = null;
+
+      // DOM Elements for new install card
+      const installCard = document.getElementById('install-card');
+      const installBtn = document.getElementById('install-btn');
+      const installDismiss = document.getElementById('install-dismiss');
+      const openAppBtn = document.getElementById('open-app-btn');
+
+      // State elements
+      const statePrompt = document.getElementById('install-state-prompt');
+      const stateInstalling = document.getElementById('install-state-installing');
+      const stateSuccess = document.getElementById('install-state-success');
+
+      // Check if already installed
+      const isInstalled = () => {
+        return window.matchMedia('(display-mode: standalone)').matches ||
+          window.matchMedia('(display-mode: fullscreen)').matches ||
+          window.matchMedia('(display-mode: minimal-ui)').matches ||
+          window.navigator.standalone === true ||
+          document.referrer.includes('android-app://');
+      };
+
+      // Check if card was dismissed recently
+      const isCardDismissed = () => {
+        const dismissUntil = localStorage.getItem('installCardDismissed');
+        if (!dismissUntil) return false;
+        if (Date.now() > parseInt(dismissUntil, 10)) {
+          localStorage.removeItem('installCardDismissed');
+          return false;
+        }
+        return true;
+      };
+
+      // Switch to a specific state
+      const switchToState = (stateName) => {
+        [statePrompt, stateInstalling, stateSuccess].forEach(el => {
+          if (el) el.classList.add('hidden');
+        });
+
+        if (stateName === 'prompt' && statePrompt) statePrompt.classList.remove('hidden');
+        if (stateName === 'installing' && stateInstalling) stateInstalling.classList.remove('hidden');
+        if (stateName === 'success' && stateSuccess) stateSuccess.classList.remove('hidden');
+      };
+
+      // Show the install card
+      const showInstallCard = () => {
+        if (!installCard || isInstalled() || isCardDismissed()) return;
+
+        console.log('📲 Showing install card');
+        switchToState('prompt');
+        installCard.classList.add('visible');
+        installCard.setAttribute('aria-hidden', 'false');
+      };
+
+      // Hide the install card
+      const hideInstallCard = () => {
+        if (!installCard) return;
+        installCard.classList.remove('visible');
+        installCard.setAttribute('aria-hidden', 'true');
+      };
+
+      // CRITICAL: Listen for the beforeinstallprompt event IMMEDIATELY
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        console.log('📲 beforeinstallprompt event captured!', e);
+        showInstallCard();
+      });
+
+      // Install button click handler
+      if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+          console.log('🔘 Install button clicked');
+
+          if (!deferredPrompt) {
+            console.log('❌ No install prompt available');
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+              alert('To install this app:\n\n1. Tap the Share button (📤)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" to confirm');
+            } else {
+              alert('To install this app, look for the install icon in your browser\'s address bar or menu.');
+            }
+            return;
+          }
+
+          // Switch to installing state
+          switchToState('installing');
+          console.log('📲 Triggering install prompt...');
+
+          // Show the install prompt
+          deferredPrompt.prompt();
+
+          // Wait for the user's response
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log(`📲 User ${outcome === 'accepted' ? 'ACCEPTED' : 'DISMISSED'} the install prompt`);
+
+          if (outcome === 'accepted') {
+            // Show success state
+            switchToState('success');
+          } else {
+            // User dismissed, hide the card
+            hideInstallCard();
+          }
+
+          // Clear the deferred prompt - it can only be used once
+          deferredPrompt = null;
+        });
+      }
+
+      // Dismiss button click handler
+      if (installDismiss) {
+        installDismiss.addEventListener('click', () => {
+          hideInstallCard();
+          // Remember dismissal for 3 days
+          const dismissUntil = Date.now() + (3 * 24 * 60 * 60 * 1000);
+          localStorage.setItem('installCardDismissed', dismissUntil.toString());
+          console.log('📲 Install card dismissed for 3 days');
+        });
+      }
+
+      // Open App button - just closes the card since they're already in the app
+      if (openAppBtn) {
+        openAppBtn.addEventListener('click', () => {
+          hideInstallCard();
+          // Show a brief celebration
+          if (typeof showVizOverlay === 'function') {
+            showVizOverlay('Welcome!\nEnjoy KING SON♪C Pro');
+          }
+        });
+      }
+
+      // Handle successful installation
+      window.addEventListener('appinstalled', () => {
+        console.log('🎉 PWA installed successfully!');
+        switchToState('success');
+        deferredPrompt = null;
+      });
+
+      // Show card after a delay as fallback
+      setTimeout(() => {
+        if (deferredPrompt && !isInstalled() && !isCardDismissed()) {
+          showInstallCard();
+        }
+      }, 3000);
+
+      // Log install prompt status for debugging
+      console.log('📲 PWA Install Card initialized', {
+        isInstalled: isInstalled(),
+        isCardDismissed: isCardDismissed(),
+        hasPrompt: !!deferredPrompt
+      });
+    })();
+  </script>
+</body>
+
+</html>
