@@ -11,17 +11,59 @@
   <!-- PWA Manifest & Meta Tags -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#ff6b35" />
-  <meta name="description" content="KING SON♪C Pro - A premium web synthesizer and piano application" />
+  <meta name="description"
+    content="KING SON♪C Pro - A premium web synthesizer and piano application with multiple tones, recording capabilities, and beautiful visualizations. Play anywhere, works offline!" />
+  <meta name="keywords"
+    content="piano, synthesizer, web app, music, PWA, keyboard, virtual piano, music production, audio" />
+  <meta name="author" content="Kingsley" />
+
+  <!-- Open Graph Meta Tags (Facebook, LinkedIn, Discord, etc.) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://kingsley-a1.github.io/Sonic-Pro/" />
+  <meta property="og:title" content="KING SON♪C Pro - Premium Web Synthesizer" />
+  <meta property="og:description"
+    content="Premium Performance • Built with Passion • Built For You! A beautiful web synthesizer with multiple tones, audio recording, and stunning visualizations." />
+  <meta property="og:image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!" />
+  <meta property="og:site_name" content="KING SON♪C Pro" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- WhatsApp Specific (uses og:image but we add itemprop for extra compatibility) -->
+  <meta itemprop="image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/whatsapp-share.png" />
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="KING SON♪C Pro - Premium Web Synthesizer" />
+  <meta name="twitter:description" content="Premium Performance • Built with Passion • Built For You! 🎹" />
+  <meta name="twitter:image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/twitter-card.png" />
+  <meta name="twitter:image:alt" content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!" />
+
+  <!-- Additional PWA & Mobile Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="SonicPro" />
+  <meta name="msapplication-TileColor" content="#ff6b35" />
+  <meta name="msapplication-TileImage" content="icons/icon-144x144.png" />
+  <meta name="format-detection" content="telephone=no" />
 
   <!-- iOS PWA Support -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="SonicPro" />
   <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144x144.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-128x128.png" />
+
+  <!-- Apple Splash Screens (optional - for a more polished iOS experience) -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-96x96.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-72x72.png" />
+  <link rel="shortcut icon" href="icons/icon-96x96.png" />
 </head>
 
 <body data-theme="orange">
@@ -108,9 +150,14 @@
 
       <div class="control-group">
         <label>Record</label>
-        <div class="record-controls">
-          <button id="record-btn" class="record-btn">● Rec</button>
-          <button id="stop-btn" class="stop-btn" disabled>Stop</button>
+        <div class="record-controls-pro">
+          <button id="record-btn" class="record-btn-pro" title="Start Recording">
+            <span class="record-icon"></span>
+            <span class="record-ring"></span>
+          </button>
+          <button id="stop-btn" class="stop-btn-pro" disabled title="Stop Recording">
+            <span class="stop-icon"></span>
+          </button>
         </div>
       </div>
     </div>
@@ -257,6 +304,74 @@
     </div>
   </div>
 
+  <!-- Exit Intent Share Prompt - Shows when user is leaving -->
+  <div id="exit-share-prompt" class="exit-share-prompt" aria-hidden="true">
+    <div class="exit-share-backdrop"></div>
+    <div class="exit-share-card">
+      <button class="exit-share-close" aria-label="Close">&times;</button>
+
+      <div class="exit-share-emoji">🎹</div>
+
+      <h2 class="exit-share-title">Enjoyed Playing?</h2>
+      <p class="exit-share-subtitle">Share KING SON♪C Pro with your friends and let them experience the music too!</p>
+
+      <div class="exit-share-stats" id="exit-share-stats">
+        <div class="stat-item">
+          <span class="stat-value" id="stat-notes-played">0</span>
+          <span class="stat-label">Notes Played</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="stat-session-time">0:00</span>
+          <span class="stat-label">Session Time</span>
+        </div>
+      </div>
+
+      <div class="exit-share-buttons">
+        <button id="exit-share-native" class="exit-share-btn primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+          Share Now
+        </button>
+        <button id="exit-share-dismiss" class="exit-share-btn secondary">Maybe Later</button>
+      </div>
+
+      <div class="exit-share-social">
+        <p>Or share directly:</p>
+        <div class="exit-share-social-icons">
+          <a href="#" id="exit-share-whatsapp" class="social-icon whatsapp" title="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+            </svg>
+          </a>
+          <a href="#" id="exit-share-twitter" class="social-icon twitter" title="Twitter/X">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </a>
+          <a href="#" id="exit-share-facebook" class="social-icon facebook" title="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+            </svg>
+          </a>
+          <a href="#" id="exit-share-copy" class="social-icon copy" title="Copy Link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 
   <!-- Service Worker & PWA Install Prompt -->
@@ -288,12 +403,13 @@
     }
 
     // ===========================================
-    // PWA INSTALL PROMPT - Enhanced Multi-State Install Card
+    // PWA INSTALL PROMPT - Enhanced Immediate Install Experience
     // ===========================================
     (function () {
       let deferredPrompt = null;
+      let installPromptReady = false;
 
-      // DOM Elements for new install card
+      // DOM Elements for install card
       const installCard = document.getElementById('install-card');
       const installBtn = document.getElementById('install-btn');
       const installDismiss = document.getElementById('install-dismiss');
@@ -304,16 +420,19 @@
       const stateInstalling = document.getElementById('install-state-installing');
       const stateSuccess = document.getElementById('install-state-success');
 
-      // Check if already installed
+      if (!installCard) return;
+
+      // Check if already installed (comprehensive check)
       const isInstalled = () => {
         return window.matchMedia('(display-mode: standalone)').matches ||
           window.matchMedia('(display-mode: fullscreen)').matches ||
           window.matchMedia('(display-mode: minimal-ui)').matches ||
           window.navigator.standalone === true ||
-          document.referrer.includes('android-app://');
+          document.referrer.includes('android-app://') ||
+          localStorage.getItem('appInstalled') === 'true';
       };
 
-      // Check if card was dismissed recently
+      // Check if card was dismissed recently (reduced to 12 hours for launch day)
       const isCardDismissed = () => {
         const dismissUntil = localStorage.getItem('installCardDismissed');
         if (!dismissUntil) return false;
@@ -322,6 +441,15 @@
           return false;
         }
         return true;
+      };
+
+      // Detect iOS/Safari
+      const isIOS = () => {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      };
+
+      const isSafari = () => {
+        return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
       };
 
       // Switch to a specific state
@@ -335,14 +463,20 @@
         if (stateName === 'success' && stateSuccess) stateSuccess.classList.remove('hidden');
       };
 
-      // Show the install card
+      // Show the install card IMMEDIATELY
       const showInstallCard = () => {
-        if (!installCard || isInstalled() || isCardDismissed()) return;
+        if (!installCard || isInstalled() || isCardDismissed()) {
+          console.log('📲 Install card skipped:', { isInstalled: isInstalled(), isCardDismissed: isCardDismissed() });
+          return;
+        }
 
-        console.log('📲 Showing install card');
+        console.log('📲 Showing install card IMMEDIATELY');
         switchToState('prompt');
         installCard.classList.add('visible');
         installCard.setAttribute('aria-hidden', 'false');
+
+        // Add entrance animation
+        installCard.style.animation = 'slideInUp 0.4s ease forwards';
       };
 
       // Hide the install card
@@ -352,11 +486,97 @@
         installCard.setAttribute('aria-hidden', 'true');
       };
 
+      // Show success state with celebration
+      const showInstallSuccess = () => {
+        switchToState('success');
+        localStorage.setItem('appInstalled', 'true');
+
+        // Trigger confetti-like celebration in the visualizer
+        if (typeof showVizOverlay === 'function') {
+          showVizOverlay('🎉 Installed!\nKING SON♪C Pro is ready');
+        }
+
+        // Auto-hide after 5 seconds if user doesn't click "Open App"
+        setTimeout(() => {
+          if (installCard.classList.contains('visible') && stateSuccess && !stateSuccess.classList.contains('hidden')) {
+            hideInstallCard();
+          }
+        }, 5000);
+      };
+
+      // iOS-specific install instructions modal
+      const showIOSInstructions = () => {
+        const modal = document.createElement('div');
+        modal.className = 'ios-install-modal';
+        modal.innerHTML = `
+          <div class="ios-install-backdrop"></div>
+          <div class="ios-install-content">
+            <button class="ios-install-close">&times;</button>
+            <div class="ios-install-header">
+              <img src="icons/icon-96x96.png" alt="KING SON♪C Pro" class="ios-install-icon">
+              <h3>Install on iPhone/iPad</h3>
+            </div>
+            <div class="ios-install-steps">
+              <div class="ios-step">
+                <span class="step-number">1</span>
+                <span class="step-text">Tap the <strong>Share</strong> button <span class="share-icon">↑</span> at the bottom of Safari</span>
+              </div>
+              <div class="ios-step">
+                <span class="step-number">2</span>
+                <span class="step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></span>
+              </div>
+              <div class="ios-step">
+                <span class="step-number">3</span>
+                <span class="step-text">Tap <strong>"Add"</strong> in the top right corner</span>
+              </div>
+            </div>
+            <p class="ios-install-note">🎹 Then open KING SON♪C Pro from your home screen for the full app experience!</p>
+            <button class="ios-install-done">Got it!</button>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Add styles dynamically
+        if (!document.getElementById('ios-install-styles')) {
+          const style = document.createElement('style');
+          style.id = 'ios-install-styles';
+          style.textContent = `
+            .ios-install-modal { position: fixed; inset: 0; z-index: 999999; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
+            .ios-install-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+            .ios-install-content { position: relative; background: linear-gradient(145deg, #2d2d2d, #1a1a1a); border-radius: 20px; padding: 28px 24px; max-width: 340px; width: calc(100% - 40px); box-shadow: 0 25px 50px rgba(0,0,0,0.5); animation: slideUp 0.4s ease; }
+            .ios-install-close { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: none; color: #888; width: 32px; height: 32px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; }
+            .ios-install-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+            .ios-install-icon { width: 56px; height: 56px; border-radius: 12px; }
+            .ios-install-header h3 { font-size: 1.2rem; color: #fff; margin: 0; }
+            .ios-install-steps { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+            .ios-step { display: flex; align-items: flex-start; gap: 12px; }
+            .step-number { background: var(--primary-color, #ff6b35); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+            .step-text { color: #ccc; font-size: 0.95rem; line-height: 1.4; }
+            .step-text strong { color: #fff; }
+            .share-icon { display: inline-block; background: #007AFF; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+            .ios-install-note { font-size: 0.85rem; color: #888; text-align: center; margin: 0 0 16px 0; }
+            .ios-install-done { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary-color, #ff6b35), #e55a2b); color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+          `;
+          document.head.appendChild(style);
+        }
+
+        // Close handlers
+        modal.querySelector('.ios-install-backdrop').addEventListener('click', () => modal.remove());
+        modal.querySelector('.ios-install-close').addEventListener('click', () => modal.remove());
+        modal.querySelector('.ios-install-done').addEventListener('click', () => {
+          modal.remove();
+          hideInstallCard();
+        });
+      };
+
       // CRITICAL: Listen for the beforeinstallprompt event IMMEDIATELY
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        console.log('📲 beforeinstallprompt event captured!', e);
+        installPromptReady = true;
+        console.log('📲 beforeinstallprompt captured! Showing install card immediately...');
+
+        // Show immediately when prompt is available
         showInstallCard();
       });
 
@@ -365,14 +585,16 @@
         installBtn.addEventListener('click', async () => {
           console.log('🔘 Install button clicked');
 
+          // iOS needs special handling
+          if (isIOS()) {
+            showIOSInstructions();
+            return;
+          }
+
           if (!deferredPrompt) {
             console.log('❌ No install prompt available');
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            if (isIOS) {
-              alert('To install this app:\n\n1. Tap the Share button (📤)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" to confirm');
-            } else {
-              alert('To install this app, look for the install icon in your browser\'s address bar or menu.');
-            }
+            // For non-iOS browsers without prompt
+            alert('To install this app:\n\n• Look for the install icon (⊕) in your browser\'s address bar\n• Or open the browser menu and select "Install app"');
             return;
           }
 
@@ -380,19 +602,23 @@
           switchToState('installing');
           console.log('📲 Triggering install prompt...');
 
-          // Show the install prompt
-          deferredPrompt.prompt();
+          try {
+            // Show the install prompt
+            deferredPrompt.prompt();
 
-          // Wait for the user's response
-          const { outcome } = await deferredPrompt.userChoice;
-          console.log(`📲 User ${outcome === 'accepted' ? 'ACCEPTED' : 'DISMISSED'} the install prompt`);
+            // Wait for the user's response
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`📲 User ${outcome === 'accepted' ? 'ACCEPTED' : 'DISMISSED'} the install prompt`);
 
-          if (outcome === 'accepted') {
-            // Show success state
-            switchToState('success');
-          } else {
-            // User dismissed, hide the card
-            hideInstallCard();
+            if (outcome === 'accepted') {
+              showInstallSuccess();
+            } else {
+              // User dismissed, hide the card
+              hideInstallCard();
+            }
+          } catch (err) {
+            console.error('Install prompt error:', err);
+            switchToState('prompt');
           }
 
           // Clear the deferred prompt - it can only be used once
@@ -404,20 +630,19 @@
       if (installDismiss) {
         installDismiss.addEventListener('click', () => {
           hideInstallCard();
-          // Remember dismissal for 3 days
-          const dismissUntil = Date.now() + (3 * 24 * 60 * 60 * 1000);
+          // Remember dismissal for 12 hours (reduced for launch day urgency)
+          const dismissUntil = Date.now() + (12 * 60 * 60 * 1000);
           localStorage.setItem('installCardDismissed', dismissUntil.toString());
-          console.log('📲 Install card dismissed for 3 days');
+          console.log('📲 Install card dismissed for 12 hours');
         });
       }
 
-      // Open App button - just closes the card since they're already in the app
+      // Open App button - closes card with celebration
       if (openAppBtn) {
         openAppBtn.addEventListener('click', () => {
           hideInstallCard();
-          // Show a brief celebration
           if (typeof showVizOverlay === 'function') {
-            showVizOverlay('Welcome!\nEnjoy KING SON♪C Pro');
+            showVizOverlay('Welcome!\nEnjoy KING SON♪C Pro 🎹');
           }
         });
       }
@@ -425,22 +650,42 @@
       // Handle successful installation
       window.addEventListener('appinstalled', () => {
         console.log('🎉 PWA installed successfully!');
-        switchToState('success');
-        deferredPrompt = null;
+        showInstallSuccess();
       });
 
-      // Show card after a delay as fallback
-      setTimeout(() => {
-        if (deferredPrompt && !isInstalled() && !isCardDismissed()) {
-          showInstallCard();
+      // IMMEDIATE SHOW: Show install card as soon as page loads
+      // For iOS, show immediately. For others, wait for beforeinstallprompt
+      if (isIOS() && !isInstalled() && !isCardDismissed()) {
+        // iOS doesn't fire beforeinstallprompt, show immediately
+        console.log('📲 iOS detected - showing install card immediately');
+        showInstallCard();
+      } else {
+        // For other browsers, show after a very short delay if prompt is ready
+        // or if we're on a browser that won't fire beforeinstallprompt
+        setTimeout(() => {
+          if (!isInstalled() && !isCardDismissed()) {
+            // If we have a prompt, show it. Otherwise, wait for beforeinstallprompt event
+            if (deferredPrompt) {
+              showInstallCard();
+            }
+          }
+        }, 500); // Very short delay for smoother UX
+      }
+
+      // Listen for display mode changes (user might install while on the page)
+      window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
+        if (e.matches) {
+          console.log('📲 App is now running in standalone mode!');
+          showInstallSuccess();
         }
-      }, 3000);
+      });
 
       // Log install prompt status for debugging
-      console.log('📲 PWA Install Card initialized', {
+      console.log('📲 PWA Install System initialized', {
         isInstalled: isInstalled(),
         isCardDismissed: isCardDismissed(),
-        hasPrompt: !!deferredPrompt
+        isIOS: isIOS(),
+        isSafari: isSafari()
       });
     })();
   </script>

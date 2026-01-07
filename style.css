@@ -171,6 +171,43 @@ screen and (min-width: 901px) {
   color: var(--primary-color);
 }
 
+/* SHARE BUTTON */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.share-btn {
+  background: transparent;
+  border: 1.5px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0.85;
+}
+
+.share-btn:hover {
+  background: var(--primary-color);
+  color: #fff;
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px var(--glow-color);
+}
+
+.share-btn:active {
+  transform: scale(0.95);
+}
+
+.share-btn svg {
+  display: block;
+}
+
 /* THEME DOTS */
 .theme-selector {
   display: flex;
@@ -486,7 +523,158 @@ input[type="range"] {
   font-size: 0.8rem;
 }
 
-/* RECORDER BUTTONS */
+/* ========================================
+   PROFESSIONAL RECORD/STOP BUTTONS
+   ======================================== */
+.record-controls-pro {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Record Button - Circular Red */
+.record-btn-pro {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid #444;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.record-btn-pro:hover:not(:disabled) {
+  border-color: #ff4444;
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(255, 68, 68, 0.3);
+}
+
+.record-btn-pro:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* The red circle icon inside */
+.record-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ff4444, #cc0000);
+  box-shadow: 0 2px 8px rgba(255, 68, 68, 0.5);
+  transition: all 0.2s ease;
+}
+
+.record-btn-pro:hover:not(:disabled) .record-icon {
+  background: linear-gradient(145deg, #ff6666, #ff4444);
+  box-shadow: 0 2px 12px rgba(255, 68, 68, 0.7);
+}
+
+/* Pulsing ring when recording */
+.record-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid #ff4444;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+/* Recording state */
+.record-btn-pro.recording {
+  border-color: #ff4444;
+  box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+}
+
+.record-btn-pro.recording .record-ring {
+  opacity: 1;
+  animation: pulse-ring 1.5s ease-in-out infinite;
+}
+
+.record-btn-pro.recording .record-icon {
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 0.3;
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 2px 20px rgba(255, 68, 68, 0.9);
+  }
+}
+
+/* Stop Button - Square Icon */
+.stop-btn-pro {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 2px solid #444;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.stop-btn-pro:hover:not(:disabled) {
+  border-color: #888;
+  background: linear-gradient(145deg, #333, #222);
+  transform: scale(1.05);
+}
+
+.stop-btn-pro:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* The square stop icon */
+.stop-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background: #888;
+  transition: all 0.2s ease;
+}
+
+.stop-btn-pro:hover:not(:disabled) .stop-icon {
+  background: #fff;
+}
+
+/* Disabled states */
+.record-btn-pro:disabled,
+.stop-btn-pro:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.record-btn-pro:disabled .record-icon {
+  background: linear-gradient(145deg, #666, #444);
+  box-shadow: none;
+}
+
+/* Legacy support for old button classes */
 .rec-controls,
 .record-controls {
   display: flex;
@@ -2022,6 +2210,430 @@ body[data-theme="black"] .install-btn-primary {
 /* Hide install card in landscape on very short screens */
 @media (orientation: landscape) and (max-height: 450px) {
   .install-card {
+    display: none;
+  }
+}
+
+/* ========================================
+   SHARE MODAL (Fallback for browsers without Web Share API)
+   ======================================== */
+.share-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.share-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+.share-modal-content {
+  position: relative;
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  border: 1px solid #404040;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 340px;
+  width: calc(100% - 40px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+.share-modal-content h3 {
+  margin: 0 0 20px 0;
+  font-size: 1.2rem;
+  text-align: center;
+  color: var(--text-light);
+}
+
+.share-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.share-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: white;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.share-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.share-option:active {
+  transform: scale(0.97);
+}
+
+.share-option.whatsapp {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+}
+
+.share-option.twitter {
+  background: linear-gradient(135deg, #1DA1F2 0%, #0d8ddb 100%);
+}
+
+.share-option.facebook {
+  background: linear-gradient(135deg, #4267B2 0%, #2d4a8a 100%);
+}
+
+.share-option.linkedin {
+  background: linear-gradient(135deg, #0077B5 0%, #005885 100%);
+}
+
+.share-modal-close {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1.5px solid #555;
+  color: #aaa;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.share-modal-close:hover {
+  background: #333;
+  border-color: #777;
+  color: white;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   EXIT SHARE PROMPT - Mobile First
+   ======================================== */
+.exit-share-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.exit-share-prompt.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.exit-share-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.exit-share-card {
+  position: relative;
+  background: linear-gradient(145deg, #2d2d2d 0%, #1a1a1a 100%);
+  border: 1px solid #404040;
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 32px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.exit-share-prompt.visible .exit-share-card {
+  transform: translateY(0);
+}
+
+/* Handle bar indicator (mobile sheet style) */
+.exit-share-card::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background: #555;
+  border-radius: 2px;
+}
+
+.exit-share-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #888;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.exit-share-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.exit-share-emoji {
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 12px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.exit-share-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-light);
+  margin: 0 0 8px 0;
+}
+
+.exit-share-subtitle {
+  font-size: 0.95rem;
+  text-align: center;
+  color: #999;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+/* Session Stats */
+.exit-share-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary-color);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #777;
+}
+
+/* Buttons */
+.exit-share-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.exit-share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.exit-share-btn.primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #e55a2b 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.exit-share-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.exit-share-btn.primary:active {
+  transform: scale(0.98);
+}
+
+.exit-share-btn.secondary {
+  background: transparent;
+  border: 1.5px solid #444;
+  color: #888;
+}
+
+.exit-share-btn.secondary:hover {
+  border-color: #666;
+  color: #ccc;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Social Icons */
+.exit-share-social {
+  text-align: center;
+}
+
+.exit-share-social>p {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0 0 12px 0;
+}
+
+.exit-share-social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.social-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.social-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.social-icon:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.social-icon:active {
+  transform: scale(0.95);
+}
+
+.social-icon.whatsapp {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+}
+
+.social-icon.twitter {
+  background: linear-gradient(135deg, #1DA1F2 0%, #0d8ddb 100%);
+}
+
+.social-icon.facebook {
+  background: linear-gradient(135deg, #4267B2 0%, #2d4a8a 100%);
+}
+
+.social-icon.copy {
+  background: linear-gradient(135deg, #666 0%, #444 100%);
+}
+
+/* Desktop styles */
+@media (min-width: 600px) {
+  .exit-share-prompt {
+    align-items: center;
+  }
+
+  .exit-share-card {
+    border-radius: 20px;
+    border: 1px solid #404040;
+    max-width: 400px;
+    padding: 32px 28px;
+    transform: translateY(30px) scale(0.95);
+  }
+
+  .exit-share-prompt.visible .exit-share-card {
+    transform: translateY(0) scale(1);
+  }
+
+  .exit-share-card::before {
+    display: none;
+  }
+
+  .exit-share-buttons {
+    flex-direction: row;
+  }
+
+  .exit-share-btn {
+    flex: 1;
+  }
+}
+
+/* Hide exit prompt in very short landscape (keyboard visible, etc) */
+@media (orientation: landscape) and (max-height: 400px) {
+  .exit-share-prompt {
     display: none;
   }
 }

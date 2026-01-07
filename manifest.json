@@ -1,11 +1,16 @@
 {
   "name": "KING SON♪C Pro",
-  "short_name": "SonicPro",
-  "id": "com.kingsley.king-sonic-pro-piano-2024",
-  "description": "A premium web synthesizer and piano application with multiple tones, recording capabilities, and beautiful visualizations.",
+  "short_name": "SON♪C Pro",
+  "id": "io.kingtechfoundation.kingsonicpro.v2026",
+  "description": "A premium web synthesizer and piano application with multiple tones, recording capabilities, and beautiful visualizations. Play anywhere, works offline!",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "landscape",
   "theme_color": "#ff6b35",
   "background_color": "#1a1a1a",
@@ -59,10 +64,51 @@
       "purpose": "maskable any"
     }
   ],
+  "shortcuts": [
+    {
+      "name": "Play Piano",
+      "short_name": "Play",
+      "description": "Start playing piano immediately",
+      "url": "./index.html?action=play",
+      "icons": [
+        {
+          "src": "./icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Record Session",
+      "short_name": "Record",
+      "description": "Start a new recording session",
+      "url": "./index.html?action=record",
+      "icons": [
+        {
+          "src": "./icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./og-images/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "KING SON♪C Pro - Premium Web Synthesizer"
+    }
+  ],
   "categories": [
     "entertainment",
-    "music"
+    "music",
+    "utilities"
   ],
+  "prefer_related_applications": false,
   "lang": "en-US",
-  "dir": "ltr"
+  "dir": "ltr",
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  }
 }

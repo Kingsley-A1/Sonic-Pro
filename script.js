@@ -525,6 +525,318 @@ window.setTheme = function (themeName) {
   });
 };
 
+// ==============================================
+// WEB SHARE API - Native Sharing
+// ==============================================
+(function initShareButton() {
+  const shareBtn = document.getElementById('share-btn');
+  if (!shareBtn) return;
+
+  const shareData = {
+    title: 'KING SON♪C Pro',
+    text: 'Premium Performance • Built with Passion • Built For You! 🎹 Check out this amazing web piano!',
+    url: window.location.href
+  };
+
+  shareBtn.addEventListener('click', async () => {
+    // Check if Web Share API is available
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+        console.log('✅ Shared successfully!');
+        showVizOverlay('Shared!\nThanks for spreading the music 🎶');
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error('Share failed:', err);
+          fallbackShare();
+        }
+      }
+    } else {
+      // Fallback for browsers without Web Share API
+      fallbackShare();
+    }
+  });
+
+  function fallbackShare() {
+    // Copy link to clipboard
+    const url = window.location.href;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        showVizOverlay('Link Copied!\nShare it anywhere 📋');
+      }).catch(() => {
+        showShareModal();
+      });
+    } else {
+      showShareModal();
+    }
+  }
+
+  function showShareModal() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent('Check out KING SON♪C Pro - Premium Performance • Built with Passion • Built For You! 🎹');
+
+    // Create a simple share modal
+    const modal = document.createElement('div');
+    modal.className = 'share-modal';
+    modal.innerHTML = `
+      <div class="share-modal-backdrop"></div>
+      <div class="share-modal-content">
+        <h3>Share KING SON♪C Pro</h3>
+        <div class="share-options">
+          <a href="https://wa.me/?text=${text}%20${url}" target="_blank" rel="noopener" class="share-option whatsapp">
+            <span>📱</span> WhatsApp
+          </a>
+          <a href="https://twitter.com/intent/tweet?text=${text}&url=${url}" target="_blank" rel="noopener" class="share-option twitter">
+            <span>🐦</span> Twitter/X
+          </a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" rel="noopener" class="share-option facebook">
+            <span>📘</span> Facebook
+          </a>
+          <a href="https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${text}" target="_blank" rel="noopener" class="share-option linkedin">
+            <span>💼</span> LinkedIn
+          </a>
+        </div>
+        <button class="share-modal-close">Close</button>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Close handlers
+    modal.querySelector('.share-modal-backdrop').addEventListener('click', () => modal.remove());
+    modal.querySelector('.share-modal-close').addEventListener('click', () => modal.remove());
+
+    // Auto-remove on link click
+    modal.querySelectorAll('.share-option').forEach(link => {
+      link.addEventListener('click', () => setTimeout(() => modal.remove(), 500));
+    });
+  }
+})();
+
+// ==============================================
+// EXIT INTENT SHARE PROMPT - Smart Exit Detection
+// ==============================================
+(function initExitSharePrompt() {
+  const EXIT_STORAGE_KEY = 'kingsonicpro_exit_share_shown';
+  const MIN_SESSION_TIME = 30000; // 30 seconds minimum before showing
+  const MIN_NOTES_PLAYED = 5; // Minimum notes to be considered engaged
+
+  // Session tracking
+  let sessionStartTime = Date.now();
+  let notesPlayedCount = 0;
+  let exitPromptShown = false;
+
+  // DOM Elements
+  const exitPrompt = document.getElementById('exit-share-prompt');
+  const exitBackdrop = exitPrompt?.querySelector('.exit-share-backdrop');
+  const exitClose = exitPrompt?.querySelector('.exit-share-close');
+  const exitDismiss = document.getElementById('exit-share-dismiss');
+  const exitShareNative = document.getElementById('exit-share-native');
+  const statNotesPlayed = document.getElementById('stat-notes-played');
+  const statSessionTime = document.getElementById('stat-session-time');
+
+  // Social links
+  const whatsappLink = document.getElementById('exit-share-whatsapp');
+  const twitterLink = document.getElementById('exit-share-twitter');
+  const facebookLink = document.getElementById('exit-share-facebook');
+  const copyLink = document.getElementById('exit-share-copy');
+
+  if (!exitPrompt) return;
+
+  // Track notes played (hook into existing triggerKey function)
+  const originalTriggerKey = window.triggerKey || null;
+  window.trackNotePlayed = function () {
+    notesPlayedCount++;
+  };
+
+  // Hook into key playing - we'll call this from the existing triggerKey
+  const pianoKeys = document.querySelectorAll('.key');
+  pianoKeys.forEach(key => {
+    key.addEventListener('mousedown', () => notesPlayedCount++);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!e.repeat && keyMap && keyMap[e.key?.toLowerCase()]) {
+      notesPlayedCount++;
+    }
+  });
+
+  // Format session time
+  function formatSessionTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${String(seconds).padStart(2, '0')}`;
+  }
+
+  // Check if prompt was shown recently (within 24 hours)
+  function wasShownRecently() {
+    const lastShown = localStorage.getItem(EXIT_STORAGE_KEY);
+    if (!lastShown) return false;
+    const hoursSince = (Date.now() - parseInt(lastShown, 10)) / (1000 * 60 * 60);
+    return hoursSince < 24;
+  }
+
+  // Check if user is engaged enough to warrant the prompt
+  function isUserEngaged() {
+    const sessionDuration = Date.now() - sessionStartTime;
+    return sessionDuration >= MIN_SESSION_TIME && notesPlayedCount >= MIN_NOTES_PLAYED;
+  }
+
+  // Update stats display
+  function updateStats() {
+    if (statNotesPlayed) statNotesPlayed.textContent = notesPlayedCount;
+    if (statSessionTime) statSessionTime.textContent = formatSessionTime(Date.now() - sessionStartTime);
+  }
+
+  // Set up social share URLs
+  function setupSocialLinks() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent('🎹 Just played amazing music on KING SON♪C Pro! Premium Performance • Built with Passion • Built For You!');
+
+    if (whatsappLink) whatsappLink.href = `https://wa.me/?text=${text}%20${url}`;
+    if (twitterLink) twitterLink.href = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+    if (facebookLink) facebookLink.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+  }
+
+  // Show the exit prompt
+  function showExitPrompt() {
+    if (exitPromptShown || wasShownRecently() || !isUserEngaged()) return;
+
+    exitPromptShown = true;
+    updateStats();
+    setupSocialLinks();
+
+    exitPrompt.classList.add('visible');
+    exitPrompt.setAttribute('aria-hidden', 'false');
+
+    // Mark as shown
+    localStorage.setItem(EXIT_STORAGE_KEY, Date.now().toString());
+  }
+
+  // Hide the exit prompt
+  function hideExitPrompt() {
+    exitPrompt.classList.remove('visible');
+    exitPrompt.setAttribute('aria-hidden', 'true');
+  }
+
+  // Native share handler
+  async function handleNativeShare() {
+    const shareData = {
+      title: 'KING SON♪C Pro',
+      text: `🎹 I just played ${notesPlayedCount} notes on KING SON♪C Pro! Try this amazing web piano - Premium Performance • Built with Passion • Built For You!`,
+      url: window.location.href
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+        hideExitPrompt();
+        showVizOverlay('Thanks for sharing! 🎶');
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error('Share failed:', err);
+        }
+      }
+    } else {
+      // Fallback - copy to clipboard
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(window.location.href);
+        hideExitPrompt();
+        showVizOverlay('Link copied! 📋');
+      }
+    }
+  }
+
+  // Copy link handler
+  async function handleCopyLink(e) {
+    e.preventDefault();
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      hideExitPrompt();
+      showVizOverlay('Link copied! 📋');
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  }
+
+  // Event Listeners for closing
+  if (exitBackdrop) exitBackdrop.addEventListener('click', hideExitPrompt);
+  if (exitClose) exitClose.addEventListener('click', hideExitPrompt);
+  if (exitDismiss) exitDismiss.addEventListener('click', hideExitPrompt);
+  if (exitShareNative) exitShareNative.addEventListener('click', handleNativeShare);
+  if (copyLink) copyLink.addEventListener('click', handleCopyLink);
+
+  // Close social links after clicking
+  [whatsappLink, twitterLink, facebookLink].forEach(link => {
+    if (link) {
+      link.addEventListener('click', () => {
+        setTimeout(hideExitPrompt, 500);
+      });
+    }
+  });
+
+  // EXIT INTENT DETECTION
+
+  // 1. Mouse leaving the viewport (desktop)
+  document.addEventListener('mouseout', (e) => {
+    if (e.clientY <= 0 && !exitPromptShown) {
+      showExitPrompt();
+    }
+  });
+
+  // 2. Page visibility change (tab switching, mobile app switching)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && !exitPromptShown) {
+      // Don't show immediately on visibility change, but mark for next return
+      if (isUserEngaged() && !wasShownRecently()) {
+        // Show when they come back
+        const showOnReturn = () => {
+          if (document.visibilityState === 'visible') {
+            setTimeout(showExitPrompt, 500);
+            document.removeEventListener('visibilitychange', showOnReturn);
+          }
+        };
+        document.addEventListener('visibilitychange', showOnReturn);
+      }
+    }
+  });
+
+  // 3. Before unload (closing tab/window)
+  window.addEventListener('beforeunload', (e) => {
+    if (isUserEngaged() && !wasShownRecently() && !exitPromptShown) {
+      // Show prompt - this will delay the close slightly
+      showExitPrompt();
+      // Note: We can't fully prevent closing, but the prompt might catch some users
+    }
+  });
+
+  // 4. Mobile: Detect back button (popstate)
+  window.addEventListener('popstate', (e) => {
+    if (!exitPromptShown && isUserEngaged()) {
+      e.preventDefault();
+      showExitPrompt();
+      // Re-push state to prevent actual navigation
+      history.pushState(null, '', window.location.href);
+    }
+  });
+
+  // Push initial state for popstate detection
+  if (history.state === null) {
+    history.pushState(null, '', window.location.href);
+  }
+
+  // Escape key to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && exitPrompt.classList.contains('visible')) {
+      hideExitPrompt();
+    }
+  });
+
+  console.log('📤 Exit Share Prompt initialized');
+})();
+
+
 // Recording Handlers (guarded — only bind listeners if elements exist)
 if (recordBtn) {
   recordBtn.addEventListener("click", () => {
@@ -533,12 +845,18 @@ if (recordBtn) {
       mediaRecorder.start();
       isRecording = true;
       recordBtn.classList.add("recording");
-      recordBtn.innerText = "● Recording...";
+      // For new pro buttons, we don't change text - the animation shows recording state
+      // For legacy buttons, update text
+      if (recordBtn.classList.contains('record-btn-pro')) {
+        // Pro button - just the recording class triggers animation
+      } else {
+        recordBtn.innerText = "● Recording...";
+      }
       if (stopBtn) stopBtn.disabled = false;
       recordBtn.disabled = true;
       // Update the record panel
       if (recordStatusEl) {
-        recordStatusEl.innerText = "Record Started";
+        recordStatusEl.innerText = "Recording...";
         recordStatusEl.classList.add("recording");
       }
       if (recordTimerEl) recordTimerEl.textContent = "00:00";
@@ -563,7 +881,10 @@ if (stopBtn) {
       isRecording = false;
       if (recordBtn) {
         recordBtn.classList.remove("recording");
-        recordBtn.innerText = "● Rec";
+        // Only set innerText for legacy buttons
+        if (!recordBtn.classList.contains('record-btn-pro')) {
+          recordBtn.innerText = "● Rec";
+        }
         recordBtn.disabled = false;
       }
       stopBtn.disabled = true;
@@ -573,8 +894,12 @@ if (stopBtn) {
         recordTimerInterval = null;
       }
       if (recordStatusEl) {
-        recordStatusEl.innerText = "Record Stopped, Ready for download!";
+        recordStatusEl.innerText = "Saved! Ready for download";
         recordStatusEl.classList.remove("recording");
+      }
+      // Show overlay feedback
+      if (typeof showVizOverlay === 'function') {
+        showVizOverlay('Recording Saved! 🎵');
       }
     }
   });
