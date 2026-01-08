@@ -2,8 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KING SON♪C Pro</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
+    />
+    <title>KING SON♪C Pro - Premium Piano & Synthesizer</title>
+
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
       rel="stylesheet"
@@ -12,44 +19,82 @@
 
     <!-- PWA Manifest & Meta Tags -->
     <link rel="manifest" href="manifest.json" />
+    <link rel="canonical" href="https://kingsley-a1.github.io/Sonic-Pro/" />
     <meta name="theme-color" content="#ff6b35" />
+    <meta name="robots" content="index, follow" />
     <meta
       name="description"
       content="KING SON♪C Pro - A premium web synthesizer and piano application with multiple tones, recording capabilities, and beautiful visualizations. Play anywhere, works offline!"
     />
     <meta
       name="keywords"
-      content="piano, synthesizer, web app, music, PWA, keyboard, virtual piano, music production, audio"
+      content="piano, synthesizer, web app, music, PWA, keyboard, virtual piano, music production, audio, KING SONIC Pro"
     />
     <meta name="author" content="Kingsley" />
 
     <!-- Open Graph Meta Tags (Facebook, LinkedIn, Discord, WhatsApp, etc.) -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://kingsley-a1.github.io/Sonic-Pro/" />
-    <meta property="og:title" content="KING SON♪C Pro - Premium Mobile Piano & Synthesizer" />
-    <meta property="og:description" content="Premium Performance • Built with Passion • Built For You! A beautiful web synthesizer with multiple tones, audio recording, and stunning visualizations." />
-    <meta property="og:image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/og-image.jpg" />
-    <meta property="og:image:secure_url" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/og-image.jpg" />
+    <meta
+      property="og:url"
+      content="https://kingsley-a1.github.io/Sonic-Pro/"
+    />
+    <meta
+      property="og:title"
+      content="KING SON♪C Pro - Premium Mobile Piano & Synthesizer"
+    />
+    <meta
+      property="og:description"
+      content="Premium Performance • Built with Passion • Built For You! A beautiful web synthesizer with multiple tones, audio recording, and stunning visualizations."
+    />
+    <meta
+      property="og:image"
+      content="https://kingsley-a1.github.io/Sonic-Pro/og-images/og-image.jpg"
+    />
+    <meta
+      property="og:image:secure_url"
+      content="https://kingsley-a1.github.io/Sonic-Pro/og-images/og-image.jpg"
+    />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!" />
+    <meta
+      property="og:image:alt"
+      content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!"
+    />
     <meta property="og:site_name" content="KING SON♪C Pro" />
     <meta property="og:locale" content="en_US" />
 
     <!-- WhatsApp Specific - optimized JPEG under 300KB (109KB) -->
     <meta itemprop="name" content="KING SON♪C Pro - Premium Mobile Piano" />
-    <meta itemprop="description" content="Premium Performance • Built with Passion • Built For You! 🎹" />
-    <meta itemprop="image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/whatsapp-share.jpg" />
+    <meta
+      itemprop="description"
+      content="Premium Performance • Built with Passion • Built For You! 🎹"
+    />
+    <meta
+      itemprop="image"
+      content="https://kingsley-a1.github.io/Sonic-Pro/og-images/whatsapp-share.jpg"
+    />
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@kingsley_a1" />
     <meta name="twitter:creator" content="@kingsley_a1" />
-    <meta name="twitter:title" content="KING SON♪C Pro - Premium Mobile Piano & Synthesizer" />
-    <meta name="twitter:description" content="Premium Performance • Built with Passion • Built For You! 🎹" />
-    <meta name="twitter:image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/twitter-card.jpg" />
-    <meta name="twitter:image:alt" content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!" />
+    <meta
+      name="twitter:title"
+      content="KING SON♪C Pro - Premium Mobile Piano & Synthesizer"
+    />
+    <meta
+      name="twitter:description"
+      content="Premium Performance • Built with Passion • Built For You! 🎹"
+    />
+    <meta
+      name="twitter:image"
+      content="https://kingsley-a1.github.io/Sonic-Pro/og-images/twitter-card.jpg"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!"
+    />
 
     <!-- Additional PWA & Mobile Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes" />
@@ -261,6 +306,22 @@
             ></span>
           </div>
         </div>
+
+        <div class="control-group speed-control">
+          <label>Speed</label>
+          <div class="speed-controls">
+            <input
+              type="range"
+              id="speed-slider"
+              min="0.5"
+              max="2"
+              step="0.1"
+              value="1"
+              title="Adjust playback speed"
+            />
+            <span id="speed-display">1.0x</span>
+          </div>
+        </div>
       </div>
 
       <div class="piano-wrapper">
@@ -405,6 +466,37 @@
           <button id="tour-next" class="tour-btn-next">Next →</button>
         </div>
         <div class="tour-progress" id="tour-progress">Step 1 of 6</div>
+      </div>
+    </div>
+
+    <!-- Landscape Install Banner - Non-blocking, elegant prompt for mobile landscape -->
+    <div
+      id="landscape-install-banner"
+      class="landscape-install-banner"
+      aria-hidden="true"
+    >
+      <div class="landscape-banner-content">
+        <div class="landscape-banner-icon">
+          <img src="icons/icon-72x72.png" alt="KING SON♪C Pro" />
+        </div>
+        <div class="landscape-banner-text">
+          <span class="landscape-banner-title">🎹 Love the experience?</span>
+          <span class="landscape-banner-subtitle"
+            >Install KING SON♪C Pro for offline access & faster loading</span
+          >
+        </div>
+        <div class="landscape-banner-actions">
+          <button id="landscape-install-btn" class="landscape-install-btn">
+            Install
+          </button>
+          <button
+            id="landscape-dismiss-btn"
+            class="landscape-dismiss-btn"
+            aria-label="Dismiss"
+          >
+            ✕
+          </button>
+        </div>
       </div>
     </div>
 
@@ -982,6 +1074,157 @@
           isIOS: isIOS(),
           isSafari: isSafari(),
         });
+
+        // ===========================================
+        // LANDSCAPE INSTALL BANNER - Smart Non-blocking
+        // ===========================================
+        const landscapeBanner = document.getElementById(
+          "landscape-install-banner"
+        );
+        const landscapeInstallBtn = document.getElementById(
+          "landscape-install-btn"
+        );
+        const landscapeDismissBtn = document.getElementById(
+          "landscape-dismiss-btn"
+        );
+
+        let landscapeBannerDismissed = false;
+        let landscapeBannerShown = false;
+        let lastOrientation = null;
+
+        // Check if on mobile device
+        const isMobileDevice = () => {
+          return (
+            /Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent) ||
+            window.innerWidth <= 900
+          );
+        };
+
+        // Check landscape orientation
+        const isLandscape = () => {
+          return window.matchMedia("(orientation: landscape)").matches;
+        };
+
+        // Show landscape banner with smart timing
+        const showLandscapeBanner = () => {
+          if (!landscapeBanner || isInstalled() || landscapeBannerDismissed)
+            return;
+          if (!isMobileDevice()) return;
+
+          // Only show if user rotated TO landscape (not on initial load in landscape)
+          landscapeBanner.classList.add("visible");
+          landscapeBanner.setAttribute("aria-hidden", "false");
+          landscapeBannerShown = true;
+          console.log("📱 Landscape install banner shown");
+
+          // Auto-hide after 8 seconds if user doesn't interact
+          setTimeout(() => {
+            if (
+              landscapeBanner.classList.contains("visible") &&
+              !landscapeBannerDismissed
+            ) {
+              hideLandscapeBanner(false); // Don't mark as dismissed, can show again
+            }
+          }, 8000);
+        };
+
+        // Hide landscape banner
+        const hideLandscapeBanner = (permanent = true) => {
+          if (!landscapeBanner) return;
+          landscapeBanner.classList.remove("visible");
+          landscapeBanner.setAttribute("aria-hidden", "true");
+          if (permanent) {
+            landscapeBannerDismissed = true;
+            sessionStorage.setItem("landscapeBannerDismissed", "true");
+          }
+        };
+
+        // Landscape install button click
+        if (landscapeInstallBtn) {
+          landscapeInstallBtn.addEventListener("click", async () => {
+            if (isIOS()) {
+              hideLandscapeBanner(true);
+              showIOSInstructions();
+              return;
+            }
+
+            if (!deferredPrompt) {
+              hideLandscapeBanner(true);
+              alert(
+                'To install this app:\n\n• Look for the install icon (⊕) in your browser\'s address bar\n• Or open the browser menu and select "Install app"'
+              );
+              return;
+            }
+
+            try {
+              deferredPrompt.prompt();
+              const { outcome } = await deferredPrompt.userChoice;
+              if (outcome === "accepted") {
+                hideLandscapeBanner(true);
+                showInstallSuccess();
+              }
+            } catch (err) {
+              console.error("Landscape install error:", err);
+            }
+            deferredPrompt = null;
+          });
+        }
+
+        // Landscape dismiss button
+        if (landscapeDismissBtn) {
+          landscapeDismissBtn.addEventListener("click", () => {
+            hideLandscapeBanner(true);
+          });
+        }
+
+        // Detect orientation changes
+        const handleOrientationChange = () => {
+          const currentOrientation = isLandscape() ? "landscape" : "portrait";
+
+          // Only trigger on actual change, not initial load
+          if (
+            lastOrientation !== null &&
+            lastOrientation !== currentOrientation
+          ) {
+            if (currentOrientation === "landscape" && isMobileDevice()) {
+              // User just rotated to landscape
+              const wasAlreadyDismissed =
+                sessionStorage.getItem("landscapeBannerDismissed") === "true";
+              if (!isInstalled() && !wasAlreadyDismissed) {
+                // Small delay to let the rotation animation complete
+                setTimeout(showLandscapeBanner, 600);
+              }
+            } else {
+              // Rotated to portrait - hide banner
+              hideLandscapeBanner(false);
+            }
+          }
+
+          lastOrientation = currentOrientation;
+        };
+
+        // Listen for orientation changes
+        window
+          .matchMedia("(orientation: landscape)")
+          .addEventListener("change", handleOrientationChange);
+        window.addEventListener("resize", () => {
+          // Debounce resize events
+          clearTimeout(window.landscapeResizeTimeout);
+          window.landscapeResizeTimeout = setTimeout(
+            handleOrientationChange,
+            100
+          );
+        });
+
+        // Initialize orientation tracking
+        lastOrientation = isLandscape() ? "landscape" : "portrait";
+
+        // Check if banner was dismissed this session
+        if (sessionStorage.getItem("landscapeBannerDismissed") === "true") {
+          landscapeBannerDismissed = true;
+        }
+
+        console.log("📱 Landscape Install Banner initialized");
       })();
     </script>
   </body>

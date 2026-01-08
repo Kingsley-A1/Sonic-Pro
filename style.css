@@ -748,7 +748,7 @@ input[type="range"] {
   display: flex;
   justify-content: center;
   background: #111;
-  padding: 10px 0;
+  padding: 10px 4px;
   border-radius: 8px;
   box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.8);
   overflow-x: auto;
@@ -757,6 +757,8 @@ input[type="range"] {
   /* in case we need a fallback vertical scroll */
   height: 100%;
   /* fill the grid row height */
+  width: 100%;
+  /* ensure full width utilization */
 }
 
 .piano-keys-list {
@@ -767,6 +769,8 @@ input[type="range"] {
   transform-origin: center center;
   /* center the keyboard visually when scaled */
   justify-content: center;
+  width: 100%;
+  /* stretch to fill available space */
 }
 
 .key {
@@ -845,10 +849,10 @@ input[disabled] {
 /* Tablet Landscape (max-width: 900px) */
 @media (max-width: 900px) {
   :root {
-    --white-key-width: 50px;
-    --white-key-height: 190px;
-    --black-key-width: 34px;
-    --black-key-height: 112px;
+    --white-key-width: 55px;
+    --white-key-height: 200px;
+    --black-key-width: 36px;
+    --black-key-height: 120px;
   }
 
   .app-container {
@@ -871,10 +875,10 @@ input[disabled] {
 /* Tablet Portrait / Large Phones (max-width: 768px) */
 @media (max-width: 768px) {
   :root {
-    --white-key-width: 45px;
-    --white-key-height: 170px;
-    --black-key-width: 30px;
-    --black-key-height: 100px;
+    --white-key-width: 52px;
+    --white-key-height: 185px;
+    --black-key-width: 34px;
+    --black-key-height: 110px;
   }
 
   .app-container {
@@ -931,10 +935,10 @@ input[disabled] {
 /* Small Tablets / Phones Landscape (max-width: 600px) */
 @media (max-width: 600px) {
   :root {
-    --white-key-width: 40px;
-    --white-key-height: 150px;
-    --black-key-width: 26px;
-    --black-key-height: 90px;
+    --white-key-width: 48px;
+    --white-key-height: 165px;
+    --black-key-width: 32px;
+    --black-key-height: 100px;
   }
 
   .app-container {
@@ -1042,10 +1046,10 @@ input[disabled] {
 /* Mobile Phones (max-width: 480px) */
 @media (max-width: 480px) {
   :root {
-    --white-key-width: 36px;
-    --white-key-height: 130px;
-    --black-key-width: 24px;
-    --black-key-height: 78px;
+    --white-key-width: 44px;
+    --white-key-height: 150px;
+    --black-key-width: 29px;
+    --black-key-height: 90px;
   }
 
   body {
@@ -1160,10 +1164,10 @@ input[disabled] {
 /* Small Phones (max-width: 375px) - iPhone SE, Galaxy S8 */
 @media (max-width: 375px) {
   :root {
-    --white-key-width: 32px;
-    --white-key-height: 115px;
-    --black-key-width: 22px;
-    --black-key-height: 69px;
+    --white-key-width: 40px;
+    --white-key-height: 135px;
+    --black-key-width: 26px;
+    --black-key-height: 81px;
   }
 
   .app-container {
@@ -1279,10 +1283,10 @@ input[disabled] {
 /* Very Small Phones (max-width: 320px) - iPhone 5/SE old */
 @media (max-width: 320px) {
   :root {
-    --white-key-width: 28px;
-    --white-key-height: 100px;
-    --black-key-width: 20px;
-    --black-key-height: 60px;
+    --white-key-width: 36px;
+    --white-key-height: 120px;
+    --black-key-width: 24px;
+    --black-key-height: 72px;
   }
 
   .app-container {
@@ -1389,10 +1393,10 @@ input[disabled] {
 /* Portrait Orientation Handling */
 @media (orientation: portrait) and (max-width: 700px) {
   :root {
-    --white-key-width: 38px;
-    --white-key-height: 140px;
-    --black-key-width: 25px;
-    --black-key-height: 84px;
+    --white-key-width: 46px;
+    --white-key-height: 160px;
+    --black-key-width: 30px;
+    --black-key-height: 96px;
   }
 
   .piano-wrapper {
@@ -1403,19 +1407,19 @@ input[disabled] {
 
 @media (orientation: portrait) and (max-width: 480px) {
   :root {
-    --white-key-width: 34px;
-    --white-key-height: 120px;
-    --black-key-width: 23px;
-    --black-key-height: 72px;
+    --white-key-width: 42px;
+    --white-key-height: 145px;
+    --black-key-width: 28px;
+    --black-key-height: 87px;
   }
 }
 
 @media (orientation: portrait) and (max-width: 375px) {
   :root {
-    --white-key-width: 30px;
-    --white-key-height: 105px;
-    --black-key-width: 21px;
-    --black-key-height: 63px;
+    --white-key-width: 38px;
+    --white-key-height: 130px;
+    --black-key-width: 25px;
+    --black-key-height: 78px;
   }
 }
 
@@ -3073,6 +3077,111 @@ body[data-theme="black"] .install-btn-primary {
 }
 
 /* ========================================
+   SPEED CONTROL STYLING
+   ======================================== */
+.speed-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.speed-controls input[type="range"] {
+  width: 70px;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, var(--primary-color) 50%, #333 50%);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.speed-controls input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.speed-controls input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 12px var(--glow-color);
+}
+
+.speed-controls input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+#speed-display {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  min-width: 32px;
+  text-align: center;
+}
+
+/* Mobile: Mic and Speed on same row at extreme ends */
+@media (max-width: 600px) {
+  .dashboard {
+    flex-wrap: wrap;
+  }
+
+  .control-group.speed-control {
+    margin-left: auto;
+  }
+
+  .speed-controls input[type="range"] {
+    width: 55px;
+  }
+
+  #speed-display {
+    font-size: 0.65rem;
+    min-width: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .speed-controls input[type="range"] {
+    width: 50px;
+  }
+
+  .speed-controls input[type="range"]::-webkit-slider-thumb {
+    width: 14px;
+    height: 14px;
+  }
+
+  #speed-display {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .speed-controls {
+    gap: 4px;
+  }
+
+  .speed-controls input[type="range"] {
+    width: 45px;
+  }
+
+  #speed-display {
+    font-size: 0.55rem;
+    min-width: 24px;
+  }
+}
+
+/* ========================================
    ENHANCED PIANO STYLING - Distinct from background
    ======================================== */
 .piano-wrapper {
@@ -3223,4 +3332,229 @@ body[data-theme="black"] .piano-wrapper {
   background: var(--primary-color);
   animation: keyRipple 0.4s ease-out forwards;
   pointer-events: none;
+}
+
+/* ========================================
+   LANDSCAPE INSTALL BANNER - Non-blocking
+   ======================================== */
+.landscape-install-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99998;
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.landscape-install-banner.visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.landscape-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(26, 26, 26, 0.97) 0%,
+    rgba(35, 35, 35, 0.97) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 107, 53, 0.2);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), 0 0 40px rgba(255, 107, 53, 0.08);
+}
+
+.landscape-banner-icon {
+  flex-shrink: 0;
+}
+
+.landscape-banner-icon img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.landscape-banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.landscape-banner-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.landscape-banner-subtitle {
+  font-size: 0.75rem;
+  color: #999;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.landscape-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.landscape-install-btn {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--primary-color), #e55a2b);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
+  white-space: nowrap;
+}
+
+.landscape-install-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+}
+
+.landscape-install-btn:active {
+  transform: scale(0.98);
+}
+
+.landscape-dismiss-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #888;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.landscape-dismiss-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* Only show in landscape on mobile */
+@media (orientation: portrait) {
+  .landscape-install-banner {
+    display: none !important;
+  }
+}
+
+/* Desktop - hide the landscape banner entirely */
+@media (min-width: 901px) {
+  .landscape-install-banner {
+    display: none !important;
+  }
+}
+
+/* Theme variants */
+body[data-theme="purple"] .landscape-banner-content {
+  border-bottom-color: rgba(155, 89, 182, 0.2);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), 0 0 40px rgba(155, 89, 182, 0.08);
+}
+
+body[data-theme="purple"] .landscape-install-btn {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  box-shadow: 0 2px 10px rgba(155, 89, 182, 0.3);
+}
+
+body[data-theme="red"] .landscape-banner-content {
+  border-bottom-color: rgba(231, 76, 60, 0.2);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), 0 0 40px rgba(231, 76, 60, 0.08);
+}
+
+body[data-theme="red"] .landscape-install-btn {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
+}
+
+body[data-theme="black"] .landscape-banner-content {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 255, 255, 0.03);
+}
+
+body[data-theme="black"] .landscape-install-btn {
+  background: linear-gradient(135deg, #ffffff, #e0e0e0);
+  color: #1a1a1a;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Smaller screens in landscape - more compact */
+@media (orientation: landscape) and (max-height: 500px) {
+  .landscape-banner-content {
+    padding: 6px 12px;
+    gap: 10px;
+  }
+
+  .landscape-banner-icon img {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .landscape-banner-title {
+    font-size: 0.8rem;
+  }
+
+  .landscape-banner-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .landscape-install-btn {
+    padding: 6px 16px;
+    font-size: 0.8rem;
+  }
+
+  .landscape-dismiss-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Very short landscape screens */
+@media (orientation: landscape) and (max-height: 400px) {
+  .landscape-banner-content {
+    padding: 4px 10px;
+  }
+
+  .landscape-banner-icon img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .landscape-banner-text {
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .landscape-banner-subtitle {
+    display: none;
+  }
 }

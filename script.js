@@ -38,6 +38,8 @@ let micSource = null;
 // Recording UI state
 let recordStartTimestamp = null;
 let recordTimerInterval = null;
+// Speed control (affects ADSR envelope timing)
+let speedMultiplier = 1.0;
 
 // DOM ELEMENTS
 const volumeSlider = document.getElementById("volume-slider");
@@ -499,30 +501,34 @@ const activeNotes = new Map();
 
 // ADSR Envelope settings per waveform type
 const ENVELOPE_SETTINGS = {
-  triangle: { // Piano-like
-    attack: 0.005,      // Very fast attack
-    decay: 0.1,         // Quick decay to sustain
-    sustainLevel: 0.7,  // Sustain at 70% of peak
-    release: 2.0        // 2 second release after key up
+  triangle: {
+    // Piano-like
+    attack: 0.005, // Very fast attack
+    decay: 0.1, // Quick decay to sustain
+    sustainLevel: 0.7, // Sustain at 70% of peak
+    release: 2.0, // 2 second release after key up
   },
-  sawtooth: { // Synth
+  sawtooth: {
+    // Synth
     attack: 0.02,
     decay: 0.15,
     sustainLevel: 0.6,
-    release: 1.5
+    release: 1.5,
   },
-  square: { // Square wave
+  square: {
+    // Square wave
     attack: 0.01,
     decay: 0.1,
     sustainLevel: 0.5,
-    release: 1.2
+    release: 1.2,
   },
-  sine: { // Sine wave - smooth
+  sine: {
+    // Sine wave - smooth
     attack: 0.03,
     decay: 0.2,
     sustainLevel: 0.8,
-    release: 2.5
-  }
+    release: 2.5,
+  },
 };
 
 // Start playing a note (called on key down)
@@ -534,7 +540,7 @@ function startNote(noteName, octaveShift = 0) {
 
   // Create unique identifier for this note
   const noteId = `${noteName}_${currentOctave + octaveShift}`;
-  
+
   // If note is already playing, stop it first (prevents overlapping)
   if (activeNotes.has(noteId)) {
     stopNote(noteName, octaveShift, true); // Quick stop for re-trigger
@@ -564,12 +570,16 @@ function startNote(noteName, octaveShift = 0) {
   const now = audioCtx.currentTime;
   const env = ENVELOPE_SETTINGS[waveform] || ENVELOPE_SETTINGS.triangle;
 
+  // Apply speed multiplier to ADSR timing (higher speed = faster envelope)
+  const attackTime = env.attack / speedMultiplier;
+  const decayTime = env.decay / speedMultiplier;
+
   // ADSR Envelope - Attack & Decay phase
   noteGain.gain.setValueAtTime(0, now);
-  noteGain.gain.linearRampToValueAtTime(masterVolume, now + env.attack);
+  noteGain.gain.linearRampToValueAtTime(masterVolume, now + attackTime);
   noteGain.gain.linearRampToValueAtTime(
-    masterVolume * env.sustainLevel, 
-    now + env.attack + env.decay
+    masterVolume * env.sustainLevel,
+    now + attackTime + decayTime
   );
 
   oscillator.start(now);
@@ -581,7 +591,9 @@ function startNote(noteName, octaveShift = 0) {
     oscillator2.frequency.value = frequency;
     try {
       oscillator2.detune.value = 8;
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
     oscillator2.connect(noteGain);
     oscillator2.start(now);
   }
@@ -592,7 +604,7 @@ function startNote(noteName, octaveShift = 0) {
     oscillator2,
     noteGain,
     startTime: now,
-    envelope: env
+    envelope: env,
   });
 }
 
@@ -600,15 +612,16 @@ function startNote(noteName, octaveShift = 0) {
 function stopNote(noteName, octaveShift = 0, quick = false) {
   const noteId = `${noteName}_${currentOctave + octaveShift}`;
   const noteData = activeNotes.get(noteId);
-  
+
   if (!noteData) return;
 
   const { oscillator, oscillator2, noteGain, envelope } = noteData;
   const now = audioCtx.currentTime;
-  
+
   // Release phase - use quick release if re-triggering, else full release
-  const releaseTime = quick ? 0.05 : envelope.release;
-  
+  // Apply speed multiplier to release timing
+  const releaseTime = quick ? 0.05 : envelope.release / speedMultiplier;
+
   // Cancel any scheduled values and start release
   noteGain.gain.cancelScheduledValues(now);
   noteGain.gain.setValueAtTime(noteGain.gain.value, now);
@@ -704,6 +717,22 @@ volumeSlider.addEventListener("input", (e) => {
     masterGain.gain.setValueAtTime(masterVolume, audioCtx.currentTime);
   }
 });
+
+// Speed Control - affects ADSR envelope timing
+const speedSlider = document.getElementById("speed-slider");
+const speedDisplay = document.getElementById("speed-display");
+
+if (speedSlider) {
+  speedSlider.addEventListener("input", (e) => {
+    speedMultiplier = parseFloat(e.target.value);
+    if (speedDisplay) {
+      speedDisplay.textContent = speedMultiplier.toFixed(1) + "x";
+    }
+    // Update slider background to show filled portion
+    const percent = ((speedMultiplier - 0.5) / 1.5) * 100;
+    speedSlider.style.background = `linear-gradient(to right, var(--primary-color) ${percent}%, #333 ${percent}%)`;
+  });
+}
 
 // Tone Switching
 document.querySelectorAll(".tone-btn").forEach((btn) => {
@@ -1191,14 +1220,14 @@ const heldKeyElements = new Map();
 const keyDown = (keyElement) => {
   if (!orientationLockTried) tryLockLandscape();
   if (!pianoEnabled) return;
-  
+
   const note = keyElement.getAttribute("data-note");
   const shift = parseInt(keyElement.getAttribute("data-octave-shift") || 0);
   const keyId = `${note}_${shift}`;
-  
+
   // Prevent re-triggering if already held
   if (heldKeys.has(keyId)) return;
-  
+
   heldKeys.add(keyId);
   heldKeyElements.set(keyId, keyElement);
 
@@ -1209,7 +1238,7 @@ const keyDown = (keyElement) => {
   keyElement.classList.add("active");
   keyElement.classList.add("ripple");
   setTimeout(() => keyElement.classList.remove("ripple"), 400);
-  
+
   // Update visual pressed key display
   tryShowPressedKey(keyElement);
 };
@@ -1217,13 +1246,13 @@ const keyDown = (keyElement) => {
 // Stop playing a key (release)
 const keyUp = (keyElement) => {
   if (!pianoEnabled) return;
-  
+
   const note = keyElement.getAttribute("data-note");
   const shift = parseInt(keyElement.getAttribute("data-octave-shift") || 0);
   const keyId = `${note}_${shift}`;
-  
+
   if (!heldKeys.has(keyId)) return;
-  
+
   heldKeys.delete(keyId);
   heldKeyElements.delete(keyId);
 
@@ -1248,15 +1277,21 @@ document.querySelectorAll(".key").forEach((key) => {
     e.preventDefault();
     keyDown(key);
   });
-  
+
   // Mouse up - stop note
   key.addEventListener("mouseup", (e) => {
     keyUp(key);
   });
-  
+
   // Mouse leave while held - stop note
   key.addEventListener("mouseleave", (e) => {
-    if (heldKeyElements.has(`${key.getAttribute("data-note")}_${parseInt(key.getAttribute("data-octave-shift") || 0)}`)) {
+    if (
+      heldKeyElements.has(
+        `${key.getAttribute("data-note")}_${parseInt(
+          key.getAttribute("data-octave-shift") || 0
+        )}`
+      )
+    ) {
       keyUp(key);
     }
   });
@@ -1272,16 +1307,24 @@ document.addEventListener("mouseup", () => {
 
 // Touch event handlers for mobile (with multi-touch support)
 document.querySelectorAll(".key").forEach((key) => {
-  key.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    keyDown(key);
-  }, { passive: false });
-  
-  key.addEventListener("touchend", (e) => {
-    e.preventDefault();
-    keyUp(key);
-  }, { passive: false });
-  
+  key.addEventListener(
+    "touchstart",
+    (e) => {
+      e.preventDefault();
+      keyDown(key);
+    },
+    { passive: false }
+  );
+
+  key.addEventListener(
+    "touchend",
+    (e) => {
+      e.preventDefault();
+      keyUp(key);
+    },
+    { passive: false }
+  );
+
   key.addEventListener("touchcancel", (e) => {
     keyUp(key);
   });
@@ -1293,10 +1336,10 @@ const keyboardHeldKeys = new Set();
 document.addEventListener("keydown", (e) => {
   if (e.repeat) return;
   if (!pianoEnabled) return;
-  
+
   const keyLower = e.key.toLowerCase();
   const el = keyMap[keyLower];
-  
+
   if (el && !keyboardHeldKeys.has(keyLower)) {
     keyboardHeldKeys.add(keyLower);
     keyDown(el);
@@ -1306,7 +1349,7 @@ document.addEventListener("keydown", (e) => {
 document.addEventListener("keyup", (e) => {
   const keyLower = e.key.toLowerCase();
   const el = keyMap[keyLower];
-  
+
   if (el && keyboardHeldKeys.has(keyLower)) {
     keyboardHeldKeys.delete(keyLower);
     keyUp(el);

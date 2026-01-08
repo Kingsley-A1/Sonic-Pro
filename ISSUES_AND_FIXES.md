@@ -286,10 +286,12 @@ The KING SON♪C Pro application is now fully enhanced with:
 ## 📋 ISSUE #12: Piano Sustain Not Realistic ✅ FIXED
 
 ### Original Problem
+
 - Piano notes cut off immediately when key is released
 - No sustain effect like real pianos/keyboards
 
 ### Solution Implemented
+
 - **ADSR Envelope System** - Attack, Decay, Sustain, Release
 - Different envelope settings per waveform:
   - Triangle (Piano): 2.0s release
@@ -300,6 +302,7 @@ The KING SON♪C Pro application is now fully enhanced with:
 - Works on desktop (mouse/keyboard) and mobile (touch)
 
 ### Files Modified
+
 - `script.js` - Complete ADSR envelope implementation
 
 ---
@@ -307,20 +310,23 @@ The KING SON♪C Pro application is now fully enhanced with:
 ## 📋 ISSUE #13: OG Images Not Showing on WhatsApp/Social ✅ FIXED
 
 ### Original Problem
+
 - OG images (638KB) were **too large** for WhatsApp
 - WhatsApp requires images **under 300KB**
 - Only link text showed, no image preview
 
 ### Solution Implemented
+
 - Created optimized **JPEG versions** (109KB each - 83% smaller!)
 - Updated all meta tags to use `.jpg` instead of `.png`:
   - `og:image` → `og-image.jpg`
-  - `twitter:image` → `twitter-card.jpg`  
+  - `twitter:image` → `twitter-card.jpg`
   - `itemprop="image"` → `whatsapp-share.jpg`
 - Updated service worker cache to v7 with new JPEGs
 - Updated manifest.json screenshots to use JPEG
 
 ### Files Modified
+
 - `index.html` - Updated all OG/Twitter/WhatsApp meta tags
 - `sw.js` - Updated cache version to v7, switched to JPEGs
 - `manifest.json` - Updated screenshots to JPEG
@@ -330,23 +336,26 @@ The KING SON♪C Pro application is now fully enhanced with:
   - `whatsapp-share.jpg` (109KB)
 
 ### Image Size Comparison
-| File | Before (PNG) | After (JPEG) | Reduction |
-|------|-------------|--------------|-----------|
-| og-image | 638KB | 109KB | **83%** |
-| twitter-card | 638KB | 109KB | **83%** |
-| whatsapp-share | 638KB | 109KB | **83%** |
+
+| File           | Before (PNG) | After (JPEG) | Reduction |
+| -------------- | ------------ | ------------ | --------- |
+| og-image       | 638KB        | 109KB        | **83%**   |
+| twitter-card   | 638KB        | 109KB        | **83%**   |
+| whatsapp-share | 638KB        | 109KB        | **83%**   |
 
 ---
 
 ## 📝 PHASE 2 TESTING
 
 ### For Piano Sustain
+
 1. Press and release a key quickly - hear 2s natural decay
 2. Press and HOLD a key - sustains as long as held
 3. Release held key - natural decay begins
 4. Test on mobile (touch) and desktop (keyboard/mouse)
 
 ### For Social Sharing
+
 1. Push to GitHub Pages
 2. Wait 5 minutes for cache to clear
 3. Test sharing on WhatsApp - image should now appear!
@@ -358,6 +367,7 @@ The KING SON♪C Pro application is now fully enhanced with:
 ## ✅ CLEANUP (Optional)
 
 You can safely delete the old PNG versions to save space:
+
 - `og-images/og-image.png` (638KB)
 - `og-images/twitter-card.png` (638KB)
 - `og-images/whatsapp-share.png` (638KB)
