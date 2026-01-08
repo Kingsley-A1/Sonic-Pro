@@ -30,7 +30,11 @@ let mediaRecorder;
 let audioChunks = [];
 // orientation lock state for mobile; we'll attempt to lock once on first user interaction
 let orientationLockTried = false;
-let pianoEnabled = false; // piano OFF by default — user must click ON
+let pianoEnabled = true; // piano ON by default for best UX
+// Microphone recording support
+let micEnabled = false;
+let micStream = null;
+let micSource = null;
 // Recording UI state
 let recordStartTimestamp = null;
 let recordTimerInterval = null;
@@ -240,15 +244,145 @@ function setPowerOn(on) {
 if (powerToggle) {
   powerToggle.addEventListener("click", () => setPowerOn(!pianoEnabled));
 }
-// default state is off, show the UI accordingly
-setPowerOn(false);
+// default state is ON for immediate playability
+setPowerOn(true);
 
 // ==============================================
-// 2. RECORDER ENGINE (New Feature)
+// 2. RECORDER ENGINE (Enhanced with Mic & WAV support)
 // ==============================================
 // Create a specific destination node just for recording
 const dest = audioCtx.createMediaStreamDestination();
 analyser.connect(dest); // Connect sound to recorder destination
+
+// Microphone toggle functionality
+const micToggle = document.getElementById("mic-toggle");
+const micIndicator = document.getElementById("mic-indicator");
+
+async function enableMicrophone() {
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    micSource = audioCtx.createMediaStreamSource(micStream);
+    micSource.connect(dest); // Connect mic to recording destination
+    micEnabled = true;
+    if (micToggle) {
+      micToggle.classList.add("on");
+      micToggle.classList.remove("off");
+      micToggle.textContent = "Mic On";
+    }
+    if (micIndicator) {
+      micIndicator.classList.add("on");
+      micIndicator.classList.remove("off");
+    }
+    showVizOverlay("🎤 Mic Enabled!\nSing along!");
+    console.log("🎤 Microphone enabled");
+  } catch (err) {
+    console.error("Microphone access denied:", err);
+    showVizOverlay("🎤 Mic Access Denied\nCheck permissions");
+  }
+}
+
+function disableMicrophone() {
+  if (micStream) {
+    micStream.getTracks().forEach(track => track.stop());
+    micStream = null;
+  }
+  if (micSource) {
+    micSource.disconnect();
+    micSource = null;
+  }
+  micEnabled = false;
+  if (micToggle) {
+    micToggle.classList.remove("on");
+    micToggle.classList.add("off");
+    micToggle.textContent = "Mic Off";
+  }
+  if (micIndicator) {
+    micIndicator.classList.remove("on");
+    micIndicator.classList.add("off");
+  }
+}
+
+if (micToggle) {
+  micToggle.addEventListener("click", () => {
+    if (!pianoEnabled) return;
+    if (micEnabled) {
+      disableMicrophone();
+    } else {
+      enableMicrophone();
+    }
+  });
+}
+
+// WAV Encoder Utility - Creates universally compatible WAV files
+function encodeWAV(samples, sampleRate, numChannels) {
+  const buffer = new ArrayBuffer(44 + samples.length * 2);
+  const view = new DataView(buffer);
+  
+  // RIFF header
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, 36 + samples.length * 2, true);
+  writeString(view, 8, 'WAVE');
+  
+  // fmt chunk
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true); // chunk size
+  view.setUint16(20, 1, true); // PCM format
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numChannels * 2, true); // byte rate
+  view.setUint16(32, numChannels * 2, true); // block align
+  view.setUint16(34, 16, true); // bits per sample
+  
+  // data chunk
+  writeString(view, 36, 'data');
+  view.setUint32(40, samples.length * 2, true);
+  
+  // Write samples
+  let offset = 44;
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    offset += 2;
+  }
+  
+  return new Blob([buffer], { type: 'audio/wav' });
+}
+
+function writeString(view, offset, string) {
+  for (let i = 0; i < string.length; i++) {
+    view.setUint8(offset + i, string.charCodeAt(i));
+  }
+}
+
+// Convert WebM blob to WAV for universal compatibility
+async function convertToWAV(blob) {
+  try {
+    const arrayBuffer = await blob.arrayBuffer();
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+    const numChannels = audioBuffer.numberOfChannels;
+    const sampleRate = audioBuffer.sampleRate;
+    const length = audioBuffer.length;
+    
+    // Mix down to mono or keep stereo
+    let samples;
+    if (numChannels === 1) {
+      samples = audioBuffer.getChannelData(0);
+    } else {
+      // Mix stereo to mono
+      const left = audioBuffer.getChannelData(0);
+      const right = audioBuffer.getChannelData(1);
+      samples = new Float32Array(length);
+      for (let i = 0; i < length; i++) {
+        samples[i] = (left[i] + right[i]) / 2;
+      }
+    }
+    
+    return encodeWAV(samples, sampleRate, 1);
+  } catch (err) {
+    console.error("WAV conversion failed, using original format:", err);
+    return blob; // Return original if conversion fails
+  }
+}
 
 // Check if MediaRecorder is supported
 if (window.MediaRecorder) {
@@ -259,29 +393,39 @@ if (window.MediaRecorder) {
     audioChunks.push(e.data);
   };
 
-  mediaRecorder.onstop = () => {
+  mediaRecorder.onstop = async () => {
     // Create a Blob from the audio chunks
-    const blob = new Blob(audioChunks, { type: "audio/webm" });
+    const webmBlob = new Blob(audioChunks, { type: "audio/webm" });
     audioChunks = []; // Reset for next recording
 
+    // Show processing status
+    if (recordStatusEl) {
+      recordStatusEl.innerText = "Processing audio...";
+    }
+
+    // Convert to WAV for universal compatibility
+    const wavBlob = await convertToWAV(webmBlob);
+    
     // Create a download link dynamically
-    const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(wavBlob);
     const a = document.createElement("a");
     a.style.display = "none";
     a.href = url;
-    a.download = `GOODEALS_Session_${new Date().getTime()}.webm`;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    a.download = `KingSonicPro_Session_${timestamp}.wav`;
     document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
 
     // Cleanup
-    // window.URL.revokeObjectURL(url);
-    // alert("Recording saved! Check your downloads.");
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    
     // Ensure final timer display and reset state
     if (recordTimerEl && recordStartTimestamp) {
       recordTimerEl.textContent = formatTime(Date.now() - recordStartTimestamp);
     }
     if (recordStatusEl) {
-      recordStatusEl.innerText = "Record Stopped, Ready for download!";
+      recordStatusEl.innerText = "Saved! Ready for download";
       recordStatusEl.classList.remove("recording");
     }
     recordStartTimestamp = null;
@@ -931,8 +1075,13 @@ const triggerKey = (keyElement) => {
 
   playNote(note, shift);
 
-  // Visual feedback
+  // Visual feedback - enhanced with ripple effect
   keyElement.classList.add("active");
+  
+  // Add beautiful ripple effect on key press
+  keyElement.classList.add("ripple");
+  setTimeout(() => keyElement.classList.remove("ripple"), 400);
+  
   setTimeout(() => keyElement.classList.remove("active"), 150);
   // Update visual pressed key display
   tryShowPressedKey(keyElement);

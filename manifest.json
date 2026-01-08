@@ -1,7 +1,7 @@
 {
   "name": "KING SON♪C Pro",
   "short_name": "SON♪C Pro",
-  "id": "kingsley.a1.github.io/Sonic-Pro",
+  "id": "com.kingsley.king-sonic-pro-2026",
   "description": "A premium sound synthesizer and piano application with multiple tones, recording capabilities, and beautiful visualizations. Play anywhere, works offline!",
   "start_url": "./index.html",
   "scope": "./",

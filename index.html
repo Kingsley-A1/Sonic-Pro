@@ -160,6 +160,16 @@
           </button>
         </div>
       </div>
+
+      <div class="control-group">
+        <label>Mic</label>
+        <div class="mic-controls">
+          <button id="mic-toggle" class="mic-btn off" aria-pressed="false" title="Enable microphone for voice recording">
+            🎤 Off
+          </button>
+          <span id="mic-indicator" class="mic-indicator off" aria-hidden="true"></span>
+        </div>
+      </div>
     </div>
 
     <div class="piano-wrapper">
@@ -403,11 +413,12 @@
     }
 
     // ===========================================
-    // PWA INSTALL PROMPT - Enhanced Immediate Install Experience
+    // PWA INSTALL PROMPT - AGGRESSIVE Immediate Install Experience
     // ===========================================
     (function () {
       let deferredPrompt = null;
       let installPromptReady = false;
+      let installCardShownCount = 0;
 
       // DOM Elements for install card
       const installCard = document.getElementById('install-card');
@@ -432,7 +443,7 @@
           localStorage.getItem('appInstalled') === 'true';
       };
 
-      // Check if card was dismissed recently (reduced to 12 hours for launch day)
+      // AGGRESSIVE: Shorter dismiss time (2 hours instead of 12)
       const isCardDismissed = () => {
         const dismissUntil = localStorage.getItem('installCardDismissed');
         if (!dismissUntil) return false;
@@ -463,20 +474,30 @@
         if (stateName === 'success' && stateSuccess) stateSuccess.classList.remove('hidden');
       };
 
-      // Show the install card IMMEDIATELY
+      // Show the install card IMMEDIATELY AND AGGRESSIVELY
       const showInstallCard = () => {
-        if (!installCard || isInstalled() || isCardDismissed()) {
-          console.log('📲 Install card skipped:', { isInstalled: isInstalled(), isCardDismissed: isCardDismissed() });
+        if (!installCard || isInstalled()) {
+          console.log('📲 Install card skipped - already installed');
           return;
         }
 
-        console.log('📲 Showing install card IMMEDIATELY');
+        // AGGRESSIVE: Show even if dismissed, but track count
+        installCardShownCount++;
+        console.log('📲 AGGRESSIVELY showing install card (count: ' + installCardShownCount + ')');
+        
         switchToState('prompt');
         installCard.classList.add('visible');
         installCard.setAttribute('aria-hidden', 'false');
 
-        // Add entrance animation
-        installCard.style.animation = 'slideInUp 0.4s ease forwards';
+        // Add entrance animation with bounce
+        installCard.style.animation = 'slideInUp 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
+        
+        // AGGRESSIVE: Add pulsing attention effect
+        setTimeout(() => {
+          if (installBtn) {
+            installBtn.style.animation = 'pulse 1.5s ease-in-out infinite';
+          }
+        }, 1000);
       };
 
       // Hide the install card
@@ -484,6 +505,7 @@
         if (!installCard) return;
         installCard.classList.remove('visible');
         installCard.setAttribute('aria-hidden', 'true');
+        if (installBtn) installBtn.style.animation = '';
       };
 
       // Show success state with celebration
@@ -544,7 +566,7 @@
             .ios-install-modal { position: fixed; inset: 0; z-index: 999999; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
             .ios-install-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
             .ios-install-content { position: relative; background: linear-gradient(145deg, #2d2d2d, #1a1a1a); border-radius: 20px; padding: 28px 24px; max-width: 340px; width: calc(100% - 40px); box-shadow: 0 25px 50px rgba(0,0,0,0.5); animation: slideUp 0.4s ease; }
-            .ios-install-close { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: none; color: #888; width: 32px; height: 32px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; }
+            .ios-install-close { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1); border: none; color: #888; width: 32px; height: 32px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 10; }
             .ios-install-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
             .ios-install-icon { width: 56px; height: 56px; border-radius: 12px; }
             .ios-install-header h3 { font-size: 1.2rem; color: #fff; margin: 0; }
@@ -574,9 +596,9 @@
         e.preventDefault();
         deferredPrompt = e;
         installPromptReady = true;
-        console.log('📲 beforeinstallprompt captured! Showing install card immediately...');
+        console.log('📲 beforeinstallprompt captured! Showing install card IMMEDIATELY...');
 
-        // Show immediately when prompt is available
+        // AGGRESSIVE: Show immediately when prompt is available, ignore dismiss
         showInstallCard();
       });
 
@@ -613,7 +635,7 @@
             if (outcome === 'accepted') {
               showInstallSuccess();
             } else {
-              // User dismissed, hide the card
+              // User dismissed, hide the card but show again soon
               hideInstallCard();
             }
           } catch (err) {
@@ -626,14 +648,14 @@
         });
       }
 
-      // Dismiss button click handler
+      // Dismiss button click handler - AGGRESSIVE: Short dismiss time
       if (installDismiss) {
         installDismiss.addEventListener('click', () => {
           hideInstallCard();
-          // Remember dismissal for 12 hours (reduced for launch day urgency)
-          const dismissUntil = Date.now() + (12 * 60 * 60 * 1000);
+          // AGGRESSIVE: Only dismiss for 2 hours (instead of 12)
+          const dismissUntil = Date.now() + (2 * 60 * 60 * 1000);
           localStorage.setItem('installCardDismissed', dismissUntil.toString());
-          console.log('📲 Install card dismissed for 12 hours');
+          console.log('📲 Install card dismissed for 2 hours only');
         });
       }
 
@@ -653,24 +675,33 @@
         showInstallSuccess();
       });
 
-      // IMMEDIATE SHOW: Show install card as soon as page loads
-      // For iOS, show immediately. For others, wait for beforeinstallprompt
-      if (isIOS() && !isInstalled() && !isCardDismissed()) {
-        // iOS doesn't fire beforeinstallprompt, show immediately
-        console.log('📲 iOS detected - showing install card immediately');
-        showInstallCard();
-      } else {
-        // For other browsers, show after a very short delay if prompt is ready
-        // or if we're on a browser that won't fire beforeinstallprompt
-        setTimeout(() => {
-          if (!isInstalled() && !isCardDismissed()) {
-            // If we have a prompt, show it. Otherwise, wait for beforeinstallprompt event
-            if (deferredPrompt) {
-              showInstallCard();
-            }
+      // AGGRESSIVE IMMEDIATE SHOW: Show install card as soon as page loads
+      // Show for ALL browsers immediately, don't wait
+      setTimeout(() => {
+        if (!isInstalled()) {
+          if (isIOS()) {
+            // iOS doesn't fire beforeinstallprompt, show immediately
+            console.log('📲 iOS detected - showing install card IMMEDIATELY');
+            if (!isCardDismissed()) showInstallCard();
+          } else if (!isCardDismissed()) {
+            // For Chrome/Edge, show card even before beforeinstallprompt fires
+            // The button will handle the case when prompt isn't ready
+            console.log('📲 Showing install card AGGRESSIVELY on load');
+            showInstallCard();
           }
-        }, 500); // Very short delay for smoother UX
-      }
+        }
+      }, 300); // Very short delay - show almost immediately
+
+      // AGGRESSIVE: Re-show after user interaction if not installed
+      let interactionCount = 0;
+      document.addEventListener('click', () => {
+        interactionCount++;
+        // After 10 clicks, if not installed and card not visible, show again
+        if (interactionCount === 10 && !isInstalled() && !installCard.classList.contains('visible')) {
+          console.log('📲 Re-showing install card after user engagement');
+          showInstallCard();
+        }
+      }, { passive: true });
 
       // Listen for display mode changes (user might install while on the page)
       window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
@@ -681,7 +712,7 @@
       });
 
       // Log install prompt status for debugging
-      console.log('📲 PWA Install System initialized', {
+      console.log('📲 PWA Install System initialized (AGGRESSIVE MODE)', {
         isInstalled: isInstalled(),
         isCardDismissed: isCardDismissed(),
         isIOS: isIOS(),
