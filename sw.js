@@ -2,7 +2,7 @@
 // Cache First, Network Fallback Strategy
 // GitHub Pages compatible with relative paths
 
-const CACHE_NAME = 'king-sonic-pro-v6';
+const CACHE_NAME = 'king-sonic-pro-v7';
 
 // Get the base path dynamically for GitHub Pages support
 const getBasePath = () => {
@@ -25,9 +25,9 @@ const CORE_ASSETS = [
   './icons/icon-192x192.png',
   './icons/icon-384x384.png',
   './icons/icon-512x512.png',
-  './og-images/og-image.png',
-  './og-images/twitter-card.png',
-  './og-images/whatsapp-share.png'
+  './og-images/og-image.jpg',
+  './og-images/twitter-card.jpg',
+  './og-images/whatsapp-share.jpg'
 ];
 
 // Install Event - Cache all core assets

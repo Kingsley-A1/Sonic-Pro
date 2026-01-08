@@ -74,7 +74,7 @@ body {
 }
 
 .rotate-overlay::before {
-  content: '';
+  content: "";
   width: 80px;
   height: 120px;
   border: 4px solid var(--primary-color);
@@ -84,7 +84,7 @@ body {
 }
 
 .rotate-overlay::after {
-  content: '↻';
+  content: "↻";
   font-size: 2.5rem;
   color: var(--primary-color);
   animation: rotateArrow 2s ease-in-out infinite;
@@ -92,7 +92,6 @@ body {
 }
 
 @keyframes rotatePhone {
-
   0%,
   100% {
     transform: rotate(0deg);
@@ -105,7 +104,6 @@ body {
 }
 
 @keyframes rotateArrow {
-
   0%,
   100% {
     opacity: 1;
@@ -131,8 +129,7 @@ body {
 }
 
 /* Hide overlay in landscape or on desktop */
-@media screen and (orientation: landscape),
-screen and (min-width: 901px) {
+@media screen and (orientation: landscape), screen and (min-width: 901px) {
   .rotate-overlay {
     display: none !important;
   }
@@ -284,9 +281,11 @@ canvas {
   align-items: center;
   justify-content: center;
   padding: 12px 10px;
-  background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.02),
-      rgba(0, 0, 0, 0.03));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(0, 0, 0, 0.03)
+  );
   border-radius: 8px;
   border: 1px solid var(--glow-border);
 }
@@ -320,17 +319,17 @@ canvas {
   height: 100% !important;
 }
 
-.visual-dashboard>.viz-left,
-.visual-dashboard>.viz-center,
-.visual-dashboard>.viz-right {
+.visual-dashboard > .viz-left,
+.visual-dashboard > .viz-center,
+.visual-dashboard > .viz-right {
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
-.visual-dashboard>.viz-left {
+.visual-dashboard > .viz-left {
   border-right: 1px solid var(--glow-border);
 }
 
-.visual-dashboard>.viz-right {
+.visual-dashboard > .viz-right {
   border-left: 1px solid var(--glow-border);
 }
 
@@ -545,7 +544,8 @@ input[type="range"] {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.05);
 }
 
 .record-btn-pro:hover:not(:disabled) {
@@ -599,7 +599,6 @@ input[type="range"] {
 }
 
 @keyframes pulse-ring {
-
   0%,
   100% {
     transform: scale(1);
@@ -613,7 +612,6 @@ input[type="range"] {
 }
 
 @keyframes pulse-glow {
-
   0%,
   100% {
     box-shadow: 0 2px 8px rgba(255, 68, 68, 0.5);
@@ -1624,7 +1622,6 @@ input[disabled] {
 
 /* Hide key labels on very small screens to save space */
 @media (max-width: 375px) {
-
   .key.white span,
   .key.black span {
     opacity: 0.7;
@@ -1632,7 +1629,6 @@ input[disabled] {
 }
 
 @media (max-width: 320px) {
-
   .key.white span,
   .key.black span {
     display: none;
@@ -1692,7 +1688,6 @@ input[disabled] {
 }
 
 @keyframes pointerBounce {
-
   0%,
   100% {
     transform: translateY(0);
@@ -1705,7 +1700,11 @@ input[disabled] {
 
 .tour-tooltip {
   position: absolute;
-  background: linear-gradient(135deg, rgba(40, 40, 40, 0.98), rgba(28, 28, 28, 0.98));
+  background: linear-gradient(
+    135deg,
+    rgba(40, 40, 40, 0.98),
+    rgba(28, 28, 28, 0.98)
+  );
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   padding: 10px 12px;
@@ -1897,7 +1896,6 @@ body[data-theme="black"] .tour-btn-next {
   box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
-
 /* ========================================
    ENHANCED INSTALL CARD (Premium PWA CTA)
    ======================================== */
@@ -1931,7 +1929,11 @@ body[data-theme="black"] .tour-btn-next {
 
 .install-card-content {
   position: relative;
-  background: linear-gradient(135deg, rgba(45, 45, 45, 0.95), rgba(30, 30, 30, 0.98));
+  background: linear-gradient(
+    135deg,
+    rgba(45, 45, 45, 0.95),
+    rgba(30, 30, 30, 0.98)
+  );
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   padding: 32px;
@@ -2008,7 +2010,6 @@ body[data-theme="black"] .tour-btn-next {
 }
 
 @keyframes iconPulse {
-
   0%,
   100% {
     transform: scale(1);
@@ -2336,19 +2337,19 @@ body[data-theme="black"] .install-btn-primary {
 }
 
 .share-option.whatsapp {
-  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
 }
 
 .share-option.twitter {
-  background: linear-gradient(135deg, #1DA1F2 0%, #0d8ddb 100%);
+  background: linear-gradient(135deg, #1da1f2 0%, #0d8ddb 100%);
 }
 
 .share-option.facebook {
-  background: linear-gradient(135deg, #4267B2 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, #4267b2 0%, #2d4a8a 100%);
 }
 
 .share-option.linkedin {
-  background: linear-gradient(135deg, #0077B5 0%, #005885 100%);
+  background: linear-gradient(135deg, #0077b5 0%, #005885 100%);
 }
 
 .share-modal-close {
@@ -2442,7 +2443,7 @@ body[data-theme="black"] .install-btn-primary {
 
 /* Handle bar indicator (mobile sheet style) */
 .exit-share-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 10px;
   left: 50%;
@@ -2488,7 +2489,6 @@ body[data-theme="black"] .install-btn-primary {
 }
 
 @keyframes bounce {
-
   0%,
   100% {
     transform: translateY(0);
@@ -2601,7 +2601,7 @@ body[data-theme="black"] .install-btn-primary {
   text-align: center;
 }
 
-.exit-share-social>p {
+.exit-share-social > p {
   font-size: 0.8rem;
   color: #666;
   margin: 0 0 12px 0;
@@ -2640,15 +2640,15 @@ body[data-theme="black"] .install-btn-primary {
 }
 
 .social-icon.whatsapp {
-  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
 }
 
 .social-icon.twitter {
-  background: linear-gradient(135deg, #1DA1F2 0%, #0d8ddb 100%);
+  background: linear-gradient(135deg, #1da1f2 0%, #0d8ddb 100%);
 }
 
 .social-icon.facebook {
-  background: linear-gradient(135deg, #4267B2 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, #4267b2 0%, #2d4a8a 100%);
 }
 
 .social-icon.copy {
@@ -2796,7 +2796,6 @@ body[data-theme="black"] .install-btn-primary {
 }
 
 @keyframes iconPulse {
-
   0%,
   100% {
     opacity: 0.3;
@@ -3054,25 +3053,38 @@ body[data-theme="black"] .install-btn-primary {
 }
 
 @keyframes micPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(231, 76, 60, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(231, 76, 60, 0);
+  }
 }
 
 @keyframes micIndicatorPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
 }
 
 /* ========================================
    ENHANCED PIANO STYLING - Distinct from background
    ======================================== */
 .piano-wrapper {
-  background: linear-gradient(180deg, #1e1e1e 0%, #0a0a0a 50%, #151515 100%) !important;
+  background: linear-gradient(
+    180deg,
+    #1e1e1e 0%,
+    #0a0a0a 50%,
+    #151515 100%
+  ) !important;
   border: 2px solid rgba(255, 107, 53, 0.15);
-  box-shadow: 
-    inset 0 5px 15px rgba(0, 0, 0, 0.8),
-    inset 0 -3px 10px rgba(255, 255, 255, 0.02),
-    0 8px 32px rgba(0, 0, 0, 0.6),
+  box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.8),
+    inset 0 -3px 10px rgba(255, 255, 255, 0.02), 0 8px 32px rgba(0, 0, 0, 0.6),
     0 0 60px rgba(255, 107, 53, 0.08);
   border-radius: 12px;
   position: relative;
@@ -3080,55 +3092,53 @@ body[data-theme="black"] .install-btn-primary {
 
 /* Piano wood grain effect overlay */
 .piano-wrapper::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: 
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 3px,
-      rgba(139, 90, 43, 0.02) 3px,
-      rgba(139, 90, 43, 0.02) 6px
-    );
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 3px,
+    rgba(139, 90, 43, 0.02) 3px,
+    rgba(139, 90, 43, 0.02) 6px
+  );
   pointer-events: none;
   border-radius: 12px;
 }
 
 /* Subtle top reflection */
 .piano-wrapper::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 10%;
   right: 10%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
   pointer-events: none;
 }
 
 /* Theme variants for piano */
 body[data-theme="purple"] .piano-wrapper {
   border-color: rgba(155, 89, 182, 0.15);
-  box-shadow: 
-    inset 0 5px 15px rgba(0, 0, 0, 0.8),
-    0 8px 32px rgba(0, 0, 0, 0.6),
+  box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.8), 0 8px 32px rgba(0, 0, 0, 0.6),
     0 0 60px rgba(155, 89, 182, 0.08);
 }
 
 body[data-theme="red"] .piano-wrapper {
   border-color: rgba(231, 76, 60, 0.15);
-  box-shadow: 
-    inset 0 5px 15px rgba(0, 0, 0, 0.8),
-    0 8px 32px rgba(0, 0, 0, 0.6),
+  box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.8), 0 8px 32px rgba(0, 0, 0, 0.6),
     0 0 60px rgba(231, 76, 60, 0.08);
 }
 
 body[data-theme="black"] .piano-wrapper {
   border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    inset 0 5px 15px rgba(0, 0, 0, 0.9),
-    0 8px 32px rgba(0, 0, 0, 0.7),
+  box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.9), 0 8px 32px rgba(0, 0, 0, 0.7),
     0 0 40px rgba(255, 255, 255, 0.03);
 }
 
@@ -3141,14 +3151,18 @@ body[data-theme="black"] .piano-wrapper {
 }
 
 .key.white::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  background: radial-gradient(ellipse at center, var(--primary-color), transparent);
+  background: radial-gradient(
+    ellipse at center,
+    var(--primary-color),
+    transparent
+  );
   opacity: 0;
   transition: all 0.15s ease;
   pointer-events: none;
@@ -3162,14 +3176,18 @@ body[data-theme="black"] .piano-wrapper {
 }
 
 .key.black::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  background: radial-gradient(ellipse at center, var(--primary-color), transparent);
+  background: radial-gradient(
+    ellipse at center,
+    var(--primary-color),
+    transparent
+  );
   opacity: 0;
   transition: all 0.15s ease;
   pointer-events: none;
@@ -3195,7 +3213,7 @@ body[data-theme="black"] .piano-wrapper {
 }
 
 .key.ripple::before {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 20%;
   left: 50%;

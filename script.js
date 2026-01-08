@@ -116,7 +116,7 @@ function resizeVisualizerCanvas() {
 function playPowerOnSound() {
   try {
     if (audioCtx.state === "suspended") audioCtx.resume();
-  } catch (e) { }
+  } catch (e) {}
   const now = audioCtx.currentTime;
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
@@ -234,7 +234,7 @@ function setPowerOn(on) {
     try {
       // resume audio context (user gesture)
       if (audioCtx.state === "suspended") audioCtx.resume();
-    } catch (e) { }
+    } catch (e) {}
     playPowerOnSound();
     showVizOverlay();
   } else {
@@ -283,7 +283,7 @@ async function enableMicrophone() {
 
 function disableMicrophone() {
   if (micStream) {
-    micStream.getTracks().forEach(track => track.stop());
+    micStream.getTracks().forEach((track) => track.stop());
     micStream = null;
   }
   if (micSource) {
@@ -317,14 +317,14 @@ if (micToggle) {
 function encodeWAV(samples, sampleRate, numChannels) {
   const buffer = new ArrayBuffer(44 + samples.length * 2);
   const view = new DataView(buffer);
-  
+
   // RIFF header
-  writeString(view, 0, 'RIFF');
+  writeString(view, 0, "RIFF");
   view.setUint32(4, 36 + samples.length * 2, true);
-  writeString(view, 8, 'WAVE');
-  
+  writeString(view, 8, "WAVE");
+
   // fmt chunk
-  writeString(view, 12, 'fmt ');
+  writeString(view, 12, "fmt ");
   view.setUint32(16, 16, true); // chunk size
   view.setUint16(20, 1, true); // PCM format
   view.setUint16(22, numChannels, true);
@@ -332,20 +332,20 @@ function encodeWAV(samples, sampleRate, numChannels) {
   view.setUint32(28, sampleRate * numChannels * 2, true); // byte rate
   view.setUint16(32, numChannels * 2, true); // block align
   view.setUint16(34, 16, true); // bits per sample
-  
+
   // data chunk
-  writeString(view, 36, 'data');
+  writeString(view, 36, "data");
   view.setUint32(40, samples.length * 2, true);
-  
+
   // Write samples
   let offset = 44;
   for (let i = 0; i < samples.length; i++) {
     const s = Math.max(-1, Math.min(1, samples[i]));
-    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
     offset += 2;
   }
-  
-  return new Blob([buffer], { type: 'audio/wav' });
+
+  return new Blob([buffer], { type: "audio/wav" });
 }
 
 function writeString(view, offset, string) {
@@ -362,7 +362,7 @@ async function convertToWAV(blob) {
     const numChannels = audioBuffer.numberOfChannels;
     const sampleRate = audioBuffer.sampleRate;
     const length = audioBuffer.length;
-    
+
     // Mix down to mono or keep stereo
     let samples;
     if (numChannels === 1) {
@@ -376,7 +376,7 @@ async function convertToWAV(blob) {
         samples[i] = (left[i] + right[i]) / 2;
       }
     }
-    
+
     return encodeWAV(samples, sampleRate, 1);
   } catch (err) {
     console.error("WAV conversion failed, using original format:", err);
@@ -405,13 +405,16 @@ if (window.MediaRecorder) {
 
     // Convert to WAV for universal compatibility
     const wavBlob = await convertToWAV(webmBlob);
-    
+
     // Create a download link dynamically
     const url = URL.createObjectURL(wavBlob);
     const a = document.createElement("a");
     a.style.display = "none";
     a.href = url;
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[:.]/g, "-")
+      .slice(0, 19);
     a.download = `KingSonicPro_Session_${timestamp}.wav`;
     document.body.appendChild(a);
     a.click();
@@ -419,7 +422,7 @@ if (window.MediaRecorder) {
 
     // Cleanup
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    
+
     // Ensure final timer display and reset state
     if (recordTimerEl && recordStartTimestamp) {
       recordTimerEl.textContent = formatTime(Date.now() - recordStartTimestamp);
@@ -488,16 +491,58 @@ function formatTime(ms) {
 }
 
 // ==============================================
-// 4. SOUND ENGINE (Core)
+// 4. SOUND ENGINE (Core) - ADSR Envelope for Realistic Sound
 // ==============================================
-function playNote(noteName, octaveShift = 0) {
+
+// Active notes tracker - maps note identifier to its audio nodes
+const activeNotes = new Map();
+
+// ADSR Envelope settings per waveform type
+const ENVELOPE_SETTINGS = {
+  triangle: { // Piano-like
+    attack: 0.005,      // Very fast attack
+    decay: 0.1,         // Quick decay to sustain
+    sustainLevel: 0.7,  // Sustain at 70% of peak
+    release: 2.0        // 2 second release after key up
+  },
+  sawtooth: { // Synth
+    attack: 0.02,
+    decay: 0.15,
+    sustainLevel: 0.6,
+    release: 1.5
+  },
+  square: { // Square wave
+    attack: 0.01,
+    decay: 0.1,
+    sustainLevel: 0.5,
+    release: 1.2
+  },
+  sine: { // Sine wave - smooth
+    attack: 0.03,
+    decay: 0.2,
+    sustainLevel: 0.8,
+    release: 2.5
+  }
+};
+
+// Start playing a note (called on key down)
+function startNote(noteName, octaveShift = 0) {
   // Ensure Context is running (browsers pause it by default)
   if (audioCtx.state === "suspended") {
     audioCtx.resume();
   }
 
+  // Create unique identifier for this note
+  const noteId = `${noteName}_${currentOctave + octaveShift}`;
+  
+  // If note is already playing, stop it first (prevents overlapping)
+  if (activeNotes.has(noteId)) {
+    stopNote(noteName, octaveShift, true); // Quick stop for re-trigger
+  }
+
   const oscillator = audioCtx.createOscillator();
   const noteGain = audioCtx.createGain();
+  let oscillator2 = null;
 
   // Connect: Oscillator -> Note Gain -> Master Gain
   oscillator.connect(noteGain);
@@ -507,45 +552,85 @@ function playNote(noteName, octaveShift = 0) {
 
   // Frequency Calculation
   let targetOctave = currentOctave + octaveShift;
-
-  // If note is "C" and octave is 4, fullNote is "C4"
   let fullNote = noteName + targetOctave;
   const frequency = getFrequency(fullNote);
 
-  if (frequency) {
-    oscillator.frequency.value = frequency;
-    const now = audioCtx.currentTime;
-
-    // Attack (Fade in fast)
-    noteGain.gain.setValueAtTime(0, now);
-    noteGain.gain.linearRampToValueAtTime(masterVolume, now + 0.02);
-
-    // Decay (Fade out)
-    noteGain.gain.exponentialRampToValueAtTime(0.001, now + 1);
-
-    oscillator.start(now);
-    // If waveform is 'sawtooth' or 'square', add a second detuned oscillator for a richer tone
-    let oscillator2;
-    if (waveform === "sawtooth" || waveform === "square") {
-      oscillator2 = audioCtx.createOscillator();
-      oscillator2.type = waveform;
-      oscillator2.frequency.value = frequency;
-      // Slight detune using frequency ratio (cents could be used via .detune)
-      try {
-        oscillator2.detune.value = 8;
-      } catch (e) {
-        /* not all browsers support detune directly */
-      }
-      oscillator2.connect(noteGain);
-      oscillator2.start(now);
-      oscillator2.stop(now + 1);
-    }
-    oscillator.stop(now + 1);
-  } else {
-    console.warn(
-      `No frequency found for note ${fullNote}. Make sure the note mapping exists (getFrequency).`
-    );
+  if (!frequency) {
+    console.warn(`No frequency found for note ${fullNote}.`);
+    return;
   }
+
+  oscillator.frequency.value = frequency;
+  const now = audioCtx.currentTime;
+  const env = ENVELOPE_SETTINGS[waveform] || ENVELOPE_SETTINGS.triangle;
+
+  // ADSR Envelope - Attack & Decay phase
+  noteGain.gain.setValueAtTime(0, now);
+  noteGain.gain.linearRampToValueAtTime(masterVolume, now + env.attack);
+  noteGain.gain.linearRampToValueAtTime(
+    masterVolume * env.sustainLevel, 
+    now + env.attack + env.decay
+  );
+
+  oscillator.start(now);
+
+  // Add second oscillator for richer synth/square tones
+  if (waveform === "sawtooth" || waveform === "square") {
+    oscillator2 = audioCtx.createOscillator();
+    oscillator2.type = waveform;
+    oscillator2.frequency.value = frequency;
+    try {
+      oscillator2.detune.value = 8;
+    } catch (e) { /* ignore */ }
+    oscillator2.connect(noteGain);
+    oscillator2.start(now);
+  }
+
+  // Store active note data for release on key up
+  activeNotes.set(noteId, {
+    oscillator,
+    oscillator2,
+    noteGain,
+    startTime: now,
+    envelope: env
+  });
+}
+
+// Stop playing a note (called on key up)
+function stopNote(noteName, octaveShift = 0, quick = false) {
+  const noteId = `${noteName}_${currentOctave + octaveShift}`;
+  const noteData = activeNotes.get(noteId);
+  
+  if (!noteData) return;
+
+  const { oscillator, oscillator2, noteGain, envelope } = noteData;
+  const now = audioCtx.currentTime;
+  
+  // Release phase - use quick release if re-triggering, else full release
+  const releaseTime = quick ? 0.05 : envelope.release;
+  
+  // Cancel any scheduled values and start release
+  noteGain.gain.cancelScheduledValues(now);
+  noteGain.gain.setValueAtTime(noteGain.gain.value, now);
+  noteGain.gain.exponentialRampToValueAtTime(0.001, now + releaseTime);
+
+  // Schedule oscillator stop after release
+  oscillator.stop(now + releaseTime + 0.1);
+  if (oscillator2) {
+    oscillator2.stop(now + releaseTime + 0.1);
+  }
+
+  // Remove from active notes
+  activeNotes.delete(noteId);
+}
+
+// Legacy function for compatibility - plays a quick note
+function playNote(noteName, octaveShift = 0) {
+  startNote(noteName, octaveShift);
+  // Auto-release after a short delay if not using hold mechanism
+  setTimeout(() => {
+    stopNote(noteName, octaveShift);
+  }, 150);
 }
 
 // Orientation lock helper: Try to lock to landscape on mobile devices
@@ -673,25 +758,29 @@ window.setTheme = function (themeName) {
 // WEB SHARE API - Native Sharing
 // ==============================================
 (function initShareButton() {
-  const shareBtn = document.getElementById('share-btn');
+  const shareBtn = document.getElementById("share-btn");
   if (!shareBtn) return;
 
   const shareData = {
-    title: 'KING SON♪C Pro',
-    text: 'Premium Performance • Built with Passion • Built For You! 🎹 Check out this amazing web piano!',
-    url: window.location.href
+    title: "KING SON♪C Pro",
+    text: "Premium Performance • Built with Passion • Built For You! 🎹 Check out this amazing web piano!",
+    url: window.location.href,
   };
 
-  shareBtn.addEventListener('click', async () => {
+  shareBtn.addEventListener("click", async () => {
     // Check if Web Share API is available
-    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+    if (
+      navigator.share &&
+      navigator.canShare &&
+      navigator.canShare(shareData)
+    ) {
       try {
         await navigator.share(shareData);
-        console.log('✅ Shared successfully!');
-        showVizOverlay('Shared!\nThanks for spreading the music 🎶');
+        console.log("✅ Shared successfully!");
+        showVizOverlay("Shared!\nThanks for spreading the music 🎶");
       } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error('Share failed:', err);
+        if (err.name !== "AbortError") {
+          console.error("Share failed:", err);
           fallbackShare();
         }
       }
@@ -706,11 +795,14 @@ window.setTheme = function (themeName) {
     const url = window.location.href;
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(() => {
-        showVizOverlay('Link Copied!\nShare it anywhere 📋');
-      }).catch(() => {
-        showShareModal();
-      });
+      navigator.clipboard
+        .writeText(url)
+        .then(() => {
+          showVizOverlay("Link Copied!\nShare it anywhere 📋");
+        })
+        .catch(() => {
+          showShareModal();
+        });
     } else {
       showShareModal();
     }
@@ -718,11 +810,13 @@ window.setTheme = function (themeName) {
 
   function showShareModal() {
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent('Check out KING SON♪C Pro - Premium Performance • Built with Passion • Built For You! 🎹');
+    const text = encodeURIComponent(
+      "Check out KING SON♪C Pro - Premium Performance • Built with Passion • Built For You! 🎹"
+    );
 
     // Create a simple share modal
-    const modal = document.createElement('div');
-    modal.className = 'share-modal';
+    const modal = document.createElement("div");
+    modal.className = "share-modal";
     modal.innerHTML = `
       <div class="share-modal-backdrop"></div>
       <div class="share-modal-content">
@@ -748,12 +842,18 @@ window.setTheme = function (themeName) {
     document.body.appendChild(modal);
 
     // Close handlers
-    modal.querySelector('.share-modal-backdrop').addEventListener('click', () => modal.remove());
-    modal.querySelector('.share-modal-close').addEventListener('click', () => modal.remove());
+    modal
+      .querySelector(".share-modal-backdrop")
+      .addEventListener("click", () => modal.remove());
+    modal
+      .querySelector(".share-modal-close")
+      .addEventListener("click", () => modal.remove());
 
     // Auto-remove on link click
-    modal.querySelectorAll('.share-option').forEach(link => {
-      link.addEventListener('click', () => setTimeout(() => modal.remove(), 500));
+    modal.querySelectorAll(".share-option").forEach((link) => {
+      link.addEventListener("click", () =>
+        setTimeout(() => modal.remove(), 500)
+      );
     });
   }
 })();
@@ -762,7 +862,7 @@ window.setTheme = function (themeName) {
 // EXIT INTENT SHARE PROMPT - Smart Exit Detection
 // ==============================================
 (function initExitSharePrompt() {
-  const EXIT_STORAGE_KEY = 'kingsonicpro_exit_share_shown';
+  const EXIT_STORAGE_KEY = "kingsonicpro_exit_share_shown";
   const MIN_SESSION_TIME = 30000; // 30 seconds minimum before showing
   const MIN_NOTES_PLAYED = 5; // Minimum notes to be considered engaged
 
@@ -772,19 +872,19 @@ window.setTheme = function (themeName) {
   let exitPromptShown = false;
 
   // DOM Elements
-  const exitPrompt = document.getElementById('exit-share-prompt');
-  const exitBackdrop = exitPrompt?.querySelector('.exit-share-backdrop');
-  const exitClose = exitPrompt?.querySelector('.exit-share-close');
-  const exitDismiss = document.getElementById('exit-share-dismiss');
-  const exitShareNative = document.getElementById('exit-share-native');
-  const statNotesPlayed = document.getElementById('stat-notes-played');
-  const statSessionTime = document.getElementById('stat-session-time');
+  const exitPrompt = document.getElementById("exit-share-prompt");
+  const exitBackdrop = exitPrompt?.querySelector(".exit-share-backdrop");
+  const exitClose = exitPrompt?.querySelector(".exit-share-close");
+  const exitDismiss = document.getElementById("exit-share-dismiss");
+  const exitShareNative = document.getElementById("exit-share-native");
+  const statNotesPlayed = document.getElementById("stat-notes-played");
+  const statSessionTime = document.getElementById("stat-session-time");
 
   // Social links
-  const whatsappLink = document.getElementById('exit-share-whatsapp');
-  const twitterLink = document.getElementById('exit-share-twitter');
-  const facebookLink = document.getElementById('exit-share-facebook');
-  const copyLink = document.getElementById('exit-share-copy');
+  const whatsappLink = document.getElementById("exit-share-whatsapp");
+  const twitterLink = document.getElementById("exit-share-twitter");
+  const facebookLink = document.getElementById("exit-share-facebook");
+  const copyLink = document.getElementById("exit-share-copy");
 
   if (!exitPrompt) return;
 
@@ -795,11 +895,11 @@ window.setTheme = function (themeName) {
   };
 
   // Hook into key playing - we'll call this from the existing triggerKey
-  const pianoKeys = document.querySelectorAll('.key');
-  pianoKeys.forEach(key => {
-    key.addEventListener('mousedown', () => notesPlayedCount++);
+  const pianoKeys = document.querySelectorAll(".key");
+  pianoKeys.forEach((key) => {
+    key.addEventListener("mousedown", () => notesPlayedCount++);
   });
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener("keydown", (e) => {
     if (!e.repeat && keyMap && keyMap[e.key?.toLowerCase()]) {
       notesPlayedCount++;
     }
@@ -810,37 +910,49 @@ window.setTheme = function (themeName) {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `${minutes}:${String(seconds).padStart(2, '0')}`;
+    return `${minutes}:${String(seconds).padStart(2, "0")}`;
   }
 
   // Check if prompt was shown recently (within 24 hours)
   function wasShownRecently() {
     const lastShown = localStorage.getItem(EXIT_STORAGE_KEY);
     if (!lastShown) return false;
-    const hoursSince = (Date.now() - parseInt(lastShown, 10)) / (1000 * 60 * 60);
+    const hoursSince =
+      (Date.now() - parseInt(lastShown, 10)) / (1000 * 60 * 60);
     return hoursSince < 24;
   }
 
   // Check if user is engaged enough to warrant the prompt
   function isUserEngaged() {
     const sessionDuration = Date.now() - sessionStartTime;
-    return sessionDuration >= MIN_SESSION_TIME && notesPlayedCount >= MIN_NOTES_PLAYED;
+    return (
+      sessionDuration >= MIN_SESSION_TIME &&
+      notesPlayedCount >= MIN_NOTES_PLAYED
+    );
   }
 
   // Update stats display
   function updateStats() {
     if (statNotesPlayed) statNotesPlayed.textContent = notesPlayedCount;
-    if (statSessionTime) statSessionTime.textContent = formatSessionTime(Date.now() - sessionStartTime);
+    if (statSessionTime)
+      statSessionTime.textContent = formatSessionTime(
+        Date.now() - sessionStartTime
+      );
   }
 
   // Set up social share URLs
   function setupSocialLinks() {
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent('🎹 Just played amazing music on KING SON♪C Pro! Premium Performance • Built with Passion • Built For You!');
+    const text = encodeURIComponent(
+      "🎹 Just played amazing music on KING SON♪C Pro! Premium Performance • Built with Passion • Built For You!"
+    );
 
-    if (whatsappLink) whatsappLink.href = `https://wa.me/?text=${text}%20${url}`;
-    if (twitterLink) twitterLink.href = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-    if (facebookLink) facebookLink.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+    if (whatsappLink)
+      whatsappLink.href = `https://wa.me/?text=${text}%20${url}`;
+    if (twitterLink)
+      twitterLink.href = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+    if (facebookLink)
+      facebookLink.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
   }
 
   // Show the exit prompt
@@ -851,8 +963,8 @@ window.setTheme = function (themeName) {
     updateStats();
     setupSocialLinks();
 
-    exitPrompt.classList.add('visible');
-    exitPrompt.setAttribute('aria-hidden', 'false');
+    exitPrompt.classList.add("visible");
+    exitPrompt.setAttribute("aria-hidden", "false");
 
     // Mark as shown
     localStorage.setItem(EXIT_STORAGE_KEY, Date.now().toString());
@@ -860,26 +972,30 @@ window.setTheme = function (themeName) {
 
   // Hide the exit prompt
   function hideExitPrompt() {
-    exitPrompt.classList.remove('visible');
-    exitPrompt.setAttribute('aria-hidden', 'true');
+    exitPrompt.classList.remove("visible");
+    exitPrompt.setAttribute("aria-hidden", "true");
   }
 
   // Native share handler
   async function handleNativeShare() {
     const shareData = {
-      title: 'KING SON♪C Pro',
+      title: "KING SON♪C Pro",
       text: `🎹 I just played ${notesPlayedCount} notes on KING SON♪C Pro! Try this amazing Mobile Piano - Premium Performance • Built with Passion • Built For You!`,
-      url: window.location.href
+      url: window.location.href,
     };
 
-    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+    if (
+      navigator.share &&
+      navigator.canShare &&
+      navigator.canShare(shareData)
+    ) {
       try {
         await navigator.share(shareData);
         hideExitPrompt();
-        showVizOverlay('Thanks for sharing! 🎶');
+        showVizOverlay("Thanks for sharing! 🎶");
       } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error('Share failed:', err);
+        if (err.name !== "AbortError") {
+          console.error("Share failed:", err);
         }
       }
     } else {
@@ -887,7 +1003,7 @@ window.setTheme = function (themeName) {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(window.location.href);
         hideExitPrompt();
-        showVizOverlay('Link copied! 📋');
+        showVizOverlay("Link copied! 📋");
       }
     }
   }
@@ -898,23 +1014,24 @@ window.setTheme = function (themeName) {
     try {
       await navigator.clipboard.writeText(window.location.href);
       hideExitPrompt();
-      showVizOverlay('Link copied! 📋');
+      showVizOverlay("Link copied! 📋");
     } catch (err) {
-      console.error('Copy failed:', err);
+      console.error("Copy failed:", err);
     }
   }
 
   // Event Listeners for closing
-  if (exitBackdrop) exitBackdrop.addEventListener('click', hideExitPrompt);
-  if (exitClose) exitClose.addEventListener('click', hideExitPrompt);
-  if (exitDismiss) exitDismiss.addEventListener('click', hideExitPrompt);
-  if (exitShareNative) exitShareNative.addEventListener('click', handleNativeShare);
-  if (copyLink) copyLink.addEventListener('click', handleCopyLink);
+  if (exitBackdrop) exitBackdrop.addEventListener("click", hideExitPrompt);
+  if (exitClose) exitClose.addEventListener("click", hideExitPrompt);
+  if (exitDismiss) exitDismiss.addEventListener("click", hideExitPrompt);
+  if (exitShareNative)
+    exitShareNative.addEventListener("click", handleNativeShare);
+  if (copyLink) copyLink.addEventListener("click", handleCopyLink);
 
   // Close social links after clicking
-  [whatsappLink, twitterLink, facebookLink].forEach(link => {
+  [whatsappLink, twitterLink, facebookLink].forEach((link) => {
     if (link) {
-      link.addEventListener('click', () => {
+      link.addEventListener("click", () => {
         setTimeout(hideExitPrompt, 500);
       });
     }
@@ -923,31 +1040,31 @@ window.setTheme = function (themeName) {
   // EXIT INTENT DETECTION
 
   // 1. Mouse leaving the viewport (desktop)
-  document.addEventListener('mouseout', (e) => {
+  document.addEventListener("mouseout", (e) => {
     if (e.clientY <= 0 && !exitPromptShown) {
       showExitPrompt();
     }
   });
 
   // 2. Page visibility change (tab switching, mobile app switching)
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden' && !exitPromptShown) {
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && !exitPromptShown) {
       // Don't show immediately on visibility change, but mark for next return
       if (isUserEngaged() && !wasShownRecently()) {
         // Show when they come back
         const showOnReturn = () => {
-          if (document.visibilityState === 'visible') {
+          if (document.visibilityState === "visible") {
             setTimeout(showExitPrompt, 500);
-            document.removeEventListener('visibilitychange', showOnReturn);
+            document.removeEventListener("visibilitychange", showOnReturn);
           }
         };
-        document.addEventListener('visibilitychange', showOnReturn);
+        document.addEventListener("visibilitychange", showOnReturn);
       }
     }
   });
 
   // 3. Before unload (closing tab/window)
-  window.addEventListener('beforeunload', (e) => {
+  window.addEventListener("beforeunload", (e) => {
     if (isUserEngaged() && !wasShownRecently() && !exitPromptShown) {
       // Show prompt - this will delay the close slightly
       showExitPrompt();
@@ -956,30 +1073,29 @@ window.setTheme = function (themeName) {
   });
 
   // 4. Mobile: Detect back button (popstate)
-  window.addEventListener('popstate', (e) => {
+  window.addEventListener("popstate", (e) => {
     if (!exitPromptShown && isUserEngaged()) {
       e.preventDefault();
       showExitPrompt();
       // Re-push state to prevent actual navigation
-      history.pushState(null, '', window.location.href);
+      history.pushState(null, "", window.location.href);
     }
   });
 
   // Push initial state for popstate detection
   if (history.state === null) {
-    history.pushState(null, '', window.location.href);
+    history.pushState(null, "", window.location.href);
   }
 
   // Escape key to close
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && exitPrompt.classList.contains('visible')) {
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && exitPrompt.classList.contains("visible")) {
       hideExitPrompt();
     }
   });
 
-  console.log('📤 Exit Share Prompt initialized');
+  console.log("📤 Exit Share Prompt initialized");
 })();
-
 
 // Recording Handlers (guarded — only bind listeners if elements exist)
 if (recordBtn) {
@@ -991,7 +1107,7 @@ if (recordBtn) {
       recordBtn.classList.add("recording");
       // For new pro buttons, we don't change text - the animation shows recording state
       // For legacy buttons, update text
-      if (recordBtn.classList.contains('record-btn-pro')) {
+      if (recordBtn.classList.contains("record-btn-pro")) {
         // Pro button - just the recording class triggers animation
       } else {
         recordBtn.innerText = "● Recording...";
@@ -1026,7 +1142,7 @@ if (stopBtn) {
       if (recordBtn) {
         recordBtn.classList.remove("recording");
         // Only set innerText for legacy buttons
-        if (!recordBtn.classList.contains('record-btn-pro')) {
+        if (!recordBtn.classList.contains("record-btn-pro")) {
           recordBtn.innerText = "● Rec";
         }
         recordBtn.disabled = false;
@@ -1042,8 +1158,8 @@ if (stopBtn) {
         recordStatusEl.classList.remove("recording");
       }
       // Show overlay feedback
-      if (typeof showVizOverlay === 'function') {
-        showVizOverlay('Recording Saved! 🎵');
+      if (typeof showVizOverlay === "function") {
+        showVizOverlay("Recording Saved! 🎵");
       }
     }
   });
@@ -1067,123 +1183,219 @@ function tryShowPressedKey(keyElement) {
   setTimeout(() => pressedKeyLetterEl.classList.remove("active"), 180);
 }
 
-const triggerKey = (keyElement) => {
+// Track which keys are currently being held
+const heldKeys = new Set();
+const heldKeyElements = new Map();
+
+// Start playing a key (press down)
+const keyDown = (keyElement) => {
   if (!orientationLockTried) tryLockLandscape();
-  if (!pianoEnabled) return; // ignore key presses if turned off
+  if (!pianoEnabled) return;
+  
   const note = keyElement.getAttribute("data-note");
   const shift = parseInt(keyElement.getAttribute("data-octave-shift") || 0);
-
-  playNote(note, shift);
-
-  // Visual feedback - enhanced with ripple effect
-  keyElement.classList.add("active");
+  const keyId = `${note}_${shift}`;
   
-  // Add beautiful ripple effect on key press
+  // Prevent re-triggering if already held
+  if (heldKeys.has(keyId)) return;
+  
+  heldKeys.add(keyId);
+  heldKeyElements.set(keyId, keyElement);
+
+  // Start the note with sustain
+  startNote(note, shift);
+
+  // Visual feedback
+  keyElement.classList.add("active");
   keyElement.classList.add("ripple");
   setTimeout(() => keyElement.classList.remove("ripple"), 400);
   
-  setTimeout(() => keyElement.classList.remove("active"), 150);
   // Update visual pressed key display
   tryShowPressedKey(keyElement);
 };
 
+// Stop playing a key (release)
+const keyUp = (keyElement) => {
+  if (!pianoEnabled) return;
+  
+  const note = keyElement.getAttribute("data-note");
+  const shift = parseInt(keyElement.getAttribute("data-octave-shift") || 0);
+  const keyId = `${note}_${shift}`;
+  
+  if (!heldKeys.has(keyId)) return;
+  
+  heldKeys.delete(keyId);
+  heldKeyElements.delete(keyId);
+
+  // Stop the note with natural release
+  stopNote(note, shift);
+
+  // Remove visual feedback
+  keyElement.classList.remove("active");
+};
+
+// Legacy triggerKey for compatibility (quick tap)
+const triggerKey = (keyElement) => {
+  keyDown(keyElement);
+  // Auto-release after short delay for tap gestures
+  setTimeout(() => keyUp(keyElement), 150);
+};
+
+// Mouse event handlers for desktop
 document.querySelectorAll(".key").forEach((key) => {
-  key.addEventListener("mousedown", () => triggerKey(key));
+  // Mouse down - start note
+  key.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    keyDown(key);
+  });
+  
+  // Mouse up - stop note
+  key.addEventListener("mouseup", (e) => {
+    keyUp(key);
+  });
+  
+  // Mouse leave while held - stop note
+  key.addEventListener("mouseleave", (e) => {
+    if (heldKeyElements.has(`${key.getAttribute("data-note")}_${parseInt(key.getAttribute("data-octave-shift") || 0)}`)) {
+      keyUp(key);
+    }
+  });
 });
 
-// also start orientation/overlay logic on the first mobile touch
-document.addEventListener("touchstart", tryLockLandscape, { once: true });
+// Global mouse up to catch releases outside keys
+document.addEventListener("mouseup", () => {
+  // Release all held keys on global mouse up
+  heldKeyElements.forEach((keyElement, keyId) => {
+    keyUp(keyElement);
+  });
+});
+
+// Touch event handlers for mobile (with multi-touch support)
+document.querySelectorAll(".key").forEach((key) => {
+  key.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    keyDown(key);
+  }, { passive: false });
+  
+  key.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    keyUp(key);
+  }, { passive: false });
+  
+  key.addEventListener("touchcancel", (e) => {
+    keyUp(key);
+  });
+});
+
+// Keyboard event handlers for desktop
+const keyboardHeldKeys = new Set();
 
 document.addEventListener("keydown", (e) => {
   if (e.repeat) return;
   if (!pianoEnabled) return;
-  const el = keyMap[e.key.toLowerCase()];
-  if (el) triggerKey(el);
+  
+  const keyLower = e.key.toLowerCase();
+  const el = keyMap[keyLower];
+  
+  if (el && !keyboardHeldKeys.has(keyLower)) {
+    keyboardHeldKeys.add(keyLower);
+    keyDown(el);
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  const keyLower = e.key.toLowerCase();
+  const el = keyMap[keyLower];
+  
+  if (el && keyboardHeldKeys.has(keyLower)) {
+    keyboardHeldKeys.delete(keyLower);
+    keyUp(el);
+  }
 });
 
 // ==============================================
 // 6. FIRST-TIME USER ONBOARDING TOUR
 // ==============================================
 (function initOnboardingTour() {
-  const TOUR_STORAGE_KEY = 'kingsonicpro_tour_completed';
+  const TOUR_STORAGE_KEY = "kingsonicpro_tour_completed";
 
   // Tour steps configuration - Power button FIRST (critical!)
   const TOUR_STEPS = [
     {
-      target: '#power-toggle',
-      title: '🔌 Power On/Off',
-      tip: 'The piano is OFF by default. Click this button to turn it ON and start playing!',
-      position: 'bottom'
+      target: "#power-toggle",
+      title: "🔌 Power On/Off",
+      tip: "The piano is OFF by default. Click this button to turn it ON and start playing!",
+      position: "bottom",
     },
     {
-      target: '.pressed-key-display',
-      title: '🎵 Key Display',
-      tip: 'This shows the current key letter and musical note you\'re playing.',
-      position: 'bottom'
+      target: ".pressed-key-display",
+      title: "🎵 Key Display",
+      tip: "This shows the current key letter and musical note you're playing.",
+      position: "bottom",
     },
     {
-      target: '#record-btn',
-      title: '🎙️ Recorder',
-      tip: 'Record your creative sessions! Click to start recording and download your music.',
-      position: 'bottom'
+      target: "#record-btn",
+      title: "🎙️ Recorder",
+      tip: "Record your creative sessions! Click to start recording and download your music.",
+      position: "bottom",
     },
     {
-      target: '.toggle-switch',
-      title: '🎹 Sound System',
-      tip: 'Choose your sound: Piano (default), Synth, Square, or Sine wave tones.',
-      position: 'bottom'
+      target: ".toggle-switch",
+      title: "🎹 Sound System",
+      tip: "Choose your sound: Piano (default), Synth, Square, or Sine wave tones.",
+      position: "bottom",
     },
     {
-      target: '.octave-controls',
-      title: '🎼 Octave Control',
-      tip: 'Shift the pitch up or down. Use − and + to change octaves.',
-      position: 'bottom'
+      target: ".octave-controls",
+      title: "🎼 Octave Control",
+      tip: "Shift the pitch up or down. Use − and + to change octaves.",
+      position: "bottom",
     },
     {
-      target: '.piano-keys-list',
-      title: '🎹 Piano Keys',
-      tip: 'Click the keys or use your keyboard (A-L, W-P) to play notes. Enjoy!',
-      position: 'top'
-    }
+      target: ".piano-keys-list",
+      title: "🎹 Piano Keys",
+      tip: "Click the keys or use your keyboard (A-L, W-P) to play notes. Enjoy!",
+      position: "top",
+    },
   ];
 
   let currentStep = 0;
 
   // DOM Elements
-  const tourContainer = document.getElementById('onboarding-tour');
-  const spotlight = document.getElementById('tour-spotlight');
-  const pointer = document.getElementById('tour-pointer');
-  const tooltip = document.getElementById('tour-tooltip');
-  const titleEl = document.getElementById('tour-title');
-  const tipEl = document.getElementById('tour-tip');
-  const progressEl = document.getElementById('tour-progress');
-  const skipBtn = document.getElementById('tour-skip');
-  const nextBtn = document.getElementById('tour-next');
+  const tourContainer = document.getElementById("onboarding-tour");
+  const spotlight = document.getElementById("tour-spotlight");
+  const pointer = document.getElementById("tour-pointer");
+  const tooltip = document.getElementById("tour-tooltip");
+  const titleEl = document.getElementById("tour-title");
+  const tipEl = document.getElementById("tour-tip");
+  const progressEl = document.getElementById("tour-progress");
+  const skipBtn = document.getElementById("tour-skip");
+  const nextBtn = document.getElementById("tour-next");
 
   // Check if tour was already completed
   function isTourCompleted() {
-    return localStorage.getItem(TOUR_STORAGE_KEY) === 'true';
+    return localStorage.getItem(TOUR_STORAGE_KEY) === "true";
   }
 
   // Mark tour as completed
   function completeTour() {
-    localStorage.setItem(TOUR_STORAGE_KEY, 'true');
+    localStorage.setItem(TOUR_STORAGE_KEY, "true");
     hideTour();
   }
 
   // Show the tour
   function showTour() {
     if (!tourContainer) return;
-    tourContainer.classList.add('active');
-    tourContainer.setAttribute('aria-hidden', 'false');
+    tourContainer.classList.add("active");
+    tourContainer.setAttribute("aria-hidden", "false");
     showStep(0);
   }
 
   // Hide the tour
   function hideTour() {
     if (!tourContainer) return;
-    tourContainer.classList.remove('active');
-    tourContainer.setAttribute('aria-hidden', 'true');
+    tourContainer.classList.remove("active");
+    tourContainer.setAttribute("aria-hidden", "true");
   }
 
   // Show a specific step
@@ -1206,9 +1418,11 @@ document.addEventListener("keydown", (e) => {
     // Update content
     if (titleEl) titleEl.textContent = step.title;
     if (tipEl) tipEl.textContent = step.tip;
-    if (progressEl) progressEl.textContent = `Step ${stepIndex + 1} of ${TOUR_STEPS.length}`;
+    if (progressEl)
+      progressEl.textContent = `Step ${stepIndex + 1} of ${TOUR_STEPS.length}`;
     if (nextBtn) {
-      nextBtn.textContent = stepIndex === TOUR_STEPS.length - 1 ? 'Got it! ✓' : 'Next →';
+      nextBtn.textContent =
+        stepIndex === TOUR_STEPS.length - 1 ? "Got it! ✓" : "Next →";
     }
 
     // Position spotlight and pointer
@@ -1234,14 +1448,14 @@ document.addEventListener("keydown", (e) => {
       const pointerLeft = rect.left + rect.width / 2 - pointerSize / 2;
       pointer.style.left = `${pointerLeft}px`;
 
-      if (position === 'top') {
+      if (position === "top") {
         // Point DOWN from above
         pointer.style.top = `${rect.top - pointerSize - 4}px`;
-        pointer.querySelector('svg').style.transform = 'rotate(180deg)';
+        pointer.querySelector("svg").style.transform = "rotate(180deg)";
       } else {
         // Point UP from below - tip touches the bottom edge
         pointer.style.top = `${rect.bottom + 4}px`;
-        pointer.querySelector('svg').style.transform = 'rotate(0deg)';
+        pointer.querySelector("svg").style.transform = "rotate(0deg)";
       }
     }
 
@@ -1251,12 +1465,15 @@ document.addEventListener("keydown", (e) => {
       let tooltipLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
 
       // Keep tooltip within screen bounds
-      tooltipLeft = Math.max(24, Math.min(tooltipLeft, window.innerWidth - tooltipWidth - 24));
+      tooltipLeft = Math.max(
+        24,
+        Math.min(tooltipLeft, window.innerWidth - tooltipWidth - 24)
+      );
 
       tooltip.style.left = `${tooltipLeft}px`;
       tooltip.style.width = `${tooltipWidth}px`;
 
-      if (position === 'top') {
+      if (position === "top") {
         tooltip.style.top = `${rect.top - pointerSize - 160}px`;
       } else {
         tooltip.style.top = `${rect.bottom + pointerSize + 12}px`;
@@ -1266,11 +1483,11 @@ document.addEventListener("keydown", (e) => {
 
   // Event listeners
   if (skipBtn) {
-    skipBtn.addEventListener('click', completeTour);
+    skipBtn.addEventListener("click", completeTour);
   }
 
   if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
+    nextBtn.addEventListener("click", () => {
       showStep(currentStep + 1);
     });
   }
@@ -1291,10 +1508,10 @@ document.addEventListener("keydown", (e) => {
         const checkOrientation = () => {
           if (window.innerWidth > window.innerHeight) {
             showTour();
-            window.removeEventListener('resize', checkOrientation);
+            window.removeEventListener("resize", checkOrientation);
           }
         };
-        window.addEventListener('resize', checkOrientation);
+        window.addEventListener("resize", checkOrientation);
       } else {
         showTour();
       }
@@ -1302,15 +1519,15 @@ document.addEventListener("keydown", (e) => {
   }
 
   // Start the tour system
-  if (document.readyState === 'complete') {
+  if (document.readyState === "complete") {
     initTour();
   } else {
-    window.addEventListener('load', initTour);
+    window.addEventListener("load", initTour);
   }
 
   // Re-position elements on resize
-  window.addEventListener('resize', () => {
-    if (tourContainer && tourContainer.classList.contains('active')) {
+  window.addEventListener("resize", () => {
+    if (tourContainer && tourContainer.classList.contains("active")) {
       const step = TOUR_STEPS[currentStep];
       const targetEl = document.querySelector(step.target);
       if (targetEl) {

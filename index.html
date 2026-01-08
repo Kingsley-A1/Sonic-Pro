@@ -1,536 +1,773 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KING SON♪C Pro</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KING SON♪C Pro</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+    <!-- PWA Manifest & Meta Tags -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#ff6b35" />
+    <meta
+      name="description"
+      content="KING SON♪C Pro - A premium web synthesizer and piano application with multiple tones, recording capabilities, and beautiful visualizations. Play anywhere, works offline!"
+    />
+    <meta
+      name="keywords"
+      content="piano, synthesizer, web app, music, PWA, keyboard, virtual piano, music production, audio"
+    />
+    <meta name="author" content="Kingsley" />
 
-  <!-- PWA Manifest & Meta Tags -->
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#ff6b35" />
-  <meta name="description"
-    content="KING SON♪C Pro - A premium web synthesizer and piano application with multiple tones, recording capabilities, and beautiful visualizations. Play anywhere, works offline!" />
-  <meta name="keywords"
-    content="piano, synthesizer, web app, music, PWA, keyboard, virtual piano, music production, audio" />
-  <meta name="author" content="Kingsley" />
+    <!-- Open Graph Meta Tags (Facebook, LinkedIn, Discord, WhatsApp, etc.) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kingsley-a1.github.io/Sonic-Pro/" />
+    <meta property="og:title" content="KING SON♪C Pro - Premium Mobile Piano & Synthesizer" />
+    <meta property="og:description" content="Premium Performance • Built with Passion • Built For You! A beautiful web synthesizer with multiple tones, audio recording, and stunning visualizations." />
+    <meta property="og:image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/og-image.jpg" />
+    <meta property="og:image:secure_url" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!" />
+    <meta property="og:site_name" content="KING SON♪C Pro" />
+    <meta property="og:locale" content="en_US" />
 
-  <!-- Open Graph Meta Tags (Facebook, LinkedIn, Discord, etc.) -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://kingsley-a1.github.io/Sonic-Pro/" />
-  <meta property="og:title" content="KING SON♪C Pro - Premium Mobile Piano & Synthesizer" />
-  <meta property="og:description"
-    content="Premium Performance • Built with Passion • Built For You! A beautiful web synthesizer with multiple tones, audio recording, and stunning visualizations." />
-  <meta property="og:image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/og-image.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!" />
-  <meta property="og:site_name" content="KING SON♪C Pro" />
-  <meta property="og:locale" content="en_US" />
+    <!-- WhatsApp Specific - optimized JPEG under 300KB (109KB) -->
+    <meta itemprop="name" content="KING SON♪C Pro - Premium Mobile Piano" />
+    <meta itemprop="description" content="Premium Performance • Built with Passion • Built For You! 🎹" />
+    <meta itemprop="image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/whatsapp-share.jpg" />
 
-  <!-- WhatsApp Specific (uses og:image but we add itemprop for extra compatibility) -->
-  <meta itemprop="image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/whatsapp-share.png" />
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@kingsley_a1" />
+    <meta name="twitter:creator" content="@kingsley_a1" />
+    <meta name="twitter:title" content="KING SON♪C Pro - Premium Mobile Piano & Synthesizer" />
+    <meta name="twitter:description" content="Premium Performance • Built with Passion • Built For You! 🎹" />
+    <meta name="twitter:image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/twitter-card.jpg" />
+    <meta name="twitter:image:alt" content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!" />
 
-  <!-- Twitter Card Meta Tags -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="KING SON♪C Pro - Premium Mobile Piano & Synthesizer" />
-  <meta name="twitter:description" content="Premium Performance • Built with Passion • Built For You! 🎹" />
-  <meta name="twitter:image" content="https://kingsley-a1.github.io/Sonic-Pro/og-images/twitter-card.png" />
-  <meta name="twitter:image:alt" content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!" />
+    <!-- Additional PWA & Mobile Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="SonicPro" />
+    <meta name="msapplication-TileColor" content="#ff6b35" />
+    <meta name="msapplication-TileImage" content="icons/icon-144x144.png" />
+    <meta name="format-detection" content="telephone=no" />
 
-  <!-- Additional PWA & Mobile Meta Tags -->
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="application-name" content="SonicPro" />
-  <meta name="msapplication-TileColor" content="#ff6b35" />
-  <meta name="msapplication-TileImage" content="icons/icon-144x144.png" />
-  <meta name="format-detection" content="telephone=no" />
+    <!-- iOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="SonicPro" />
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="icons/icon-192x192.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="icons/icon-152x152.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="144x144"
+      href="icons/icon-144x144.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="120x120"
+      href="icons/icon-128x128.png"
+    />
 
-  <!-- iOS PWA Support -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="SonicPro" />
-  <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192x192.png" />
-  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png" />
-  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144x144.png" />
-  <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-128x128.png" />
+    <!-- Apple Splash Screens (optional - for a more polished iOS experience) -->
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
 
-  <!-- Apple Splash Screens (optional - for a more polished iOS experience) -->
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="icons/icon-96x96.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="icons/icon-72x72.png"
+    />
+    <link rel="shortcut icon" href="icons/icon-96x96.png" />
+  </head>
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-96x96.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-72x72.png" />
-  <link rel="shortcut icon" href="icons/icon-96x96.png" />
-</head>
-
-<body data-theme="orange">
-  <!-- Mandatory Landscape Overlay - Blocks portrait mode on mobile -->
-  <div id="rotate-overlay" class="rotate-overlay" role="dialog" aria-modal="true"
-    aria-label="Please rotate your device">
-    <div class="msg">
-      <strong>🎹 Rotate Your Device</strong><br><br>
-      KING SON♪C Pro requires landscape orientation for the best piano experience.
-    </div>
-  </div>
-  <div class="app-container">
-    <header class="synth-header">
-      <div class="logo-container">
-        <h1 class="brand-name">KING SON♪C <span class="accent">Pro</span></h1>
-      </div>
-
-      <div class="theme-selector">
-        <label>Theme:</label>
-        <div class="theme-dots">
-          <button class="dot orange active" onclick="setTheme('orange')"></button>
-          <button class="dot purple" onclick="setTheme('purple')"></button>
-          <button class="dot red" onclick="setTheme('red')"></button>
-          <button class="dot black" onclick="setTheme('black')"></button>
-        </div>
-      </div>
-    </header>
-
-    <div class="visual-dashboard">
-      <div class="viz-left">
-        <div class="pressed-key-display">
-          <div class="pressed-key-letter" id="pressed-key-letter">&nbsp;</div>
-          <div class="pressed-key-note" id="pressed-key-note">&nbsp;</div>
-        </div>
-      </div>
-      <div class="viz-center viz-container">
-        <canvas id="visualizer" width="800" height="100"></canvas>
-        <div id="viz-overlay" class="viz-overlay" aria-hidden="true" role="status" aria-live="polite">
-          <span>Welcome to</span>
-          <span>KING SON♪C Pro</span>
-        </div>
-      </div>
-      <div class="viz-right">
-        <div class="record-panel">
-          <div id="record-status">RECORD YOUR creativity!</div>
-          <div id="record-timer">00:00</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="dashboard">
-      <div class="control-group">
-        <label>Master Vol</label>
-        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" />
-      </div>
-
-      <div class="control-group">
-        <label>Tone</label>
-        <div class="toggle-switch">
-          <button class="tone-btn active" data-type="triangle">Piano</button>
-          <button class="tone-btn" data-type="sawtooth">Synth</button>
-          <button class="tone-btn" data-type="square">Square</button>
-          <button class="tone-btn" data-type="sine">Sine</button>
-        </div>
-      </div>
-
-      <div class="control-group">
-        <label>Octave</label>
-        <div class="octave-controls">
-          <button id="octave-down" class="octave-btn">−</button>
-          <span id="octave-display">C4</span>
-          <button id="octave-up" class="octave-btn">+</button>
-        </div>
-      </div>
-      <div class="control-group">
-        <label>Power</label>
-        <div class="power-controls">
-          <button id="power-toggle" class="power-btn off" aria-pressed="false">
-            Off
-          </button>
-          <span id="power-indicator" class="power-indicator off" aria-hidden="true"></span>
-        </div>
-      </div>
-
-      <div class="control-group">
-        <label>Record</label>
-        <div class="record-controls-pro">
-          <button id="record-btn" class="record-btn-pro" title="Start Recording">
-            <span class="record-icon"></span>
-            <span class="record-ring"></span>
-          </button>
-          <button id="stop-btn" class="stop-btn-pro" disabled title="Stop Recording">
-            <span class="stop-icon"></span>
-          </button>
-        </div>
-      </div>
-
-      <div class="control-group">
-        <label>Mic</label>
-        <div class="mic-controls">
-          <button id="mic-toggle" class="mic-btn off" aria-pressed="false" title="Enable microphone for voice recording">
-            🎤 Off
-          </button>
-          <span id="mic-indicator" class="mic-indicator off" aria-hidden="true"></span>
-        </div>
+  <body data-theme="orange">
+    <!-- Mandatory Landscape Overlay - Blocks portrait mode on mobile -->
+    <div
+      id="rotate-overlay"
+      class="rotate-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Please rotate your device"
+    >
+      <div class="msg">
+        <strong>🎹 Rotate Your Device</strong><br /><br />
+        KING SON♪C Pro requires landscape orientation for the best piano
+        experience.
       </div>
     </div>
-
-    <div class="piano-wrapper">
-      <ul class="piano-keys-list" id="piano-keys">
-        <li class="key white" data-note="C" data-key="a"><span>A</span></li>
-        <li class="key black" data-note="C#" data-key="w"><span>W</span></li>
-        <li class="key white" data-note="D" data-key="s"><span>S</span></li>
-        <li class="key black" data-note="D#" data-key="e"><span>E</span></li>
-        <li class="key white" data-note="E" data-key="d"><span>D</span></li>
-        <li class="key white" data-note="F" data-key="f"><span>F</span></li>
-        <li class="key black" data-note="F#" data-key="t"><span>T</span></li>
-        <li class="key white" data-note="G" data-key="g"><span>G</span></li>
-        <li class="key black" data-note="G#" data-key="y"><span>Y</span></li>
-        <li class="key white" data-note="A" data-key="h"><span>H</span></li>
-        <li class="key black" data-note="A#" data-key="u"><span>U</span></li>
-        <li class="key white" data-note="B" data-key="j"><span>J</span></li>
-        <li class="key white" data-note="C" data-key="k" data-octave-shift="1">
-          <span>K</span>
-        </li>
-        <!-- Extra (higher) octave for extended range: octave-shift="2" -->
-        <li class="key black" data-note="C#" data-octave-shift="2" data-key="o">
-          <span>O</span>
-        </li>
-        <li class="key white" data-note="D" data-octave-shift="2" data-key="l">
-          <span>L</span>
-        </li>
-        <li class="key black" data-note="D#" data-octave-shift="2" data-key="p">
-          <span>P</span>
-        </li>
-        <li class="key white" data-note="E" data-octave-shift="2" data-key=";">
-          <span>;</span>
-        </li>
-        <li class="key white" data-note="F" data-octave-shift="2" data-key="'">
-          <span>'</span>
-        </li>
-        <li class="key black" data-note="F#" data-octave-shift="2" data-key="\\">
-          <span>\\</span>
-        </li>
-        <li class="key white" data-note="G" data-octave-shift="2" data-key="z">
-          <span>Z</span>
-        </li>
-        <li class="key black" data-note="G#" data-octave-shift="2" data-key="i">
-          <span>I</span>
-        </li>
-        <li class="key white" data-note="A" data-octave-shift="2" data-key="x">
-          <span>X</span>
-        </li>
-        <li class="key black" data-note="A#" data-octave-shift="2" data-key="m">
-          <span>M</span>
-        </li>
-        <li class="key white" data-note="B" data-octave-shift="2" data-key="c">
-          <span>C</span>
-        </li>
-        <li class="key white" data-note="C" data-octave-shift="2" data-key="v">
-          <span>V</span>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- First-Time User Onboarding Tour -->
-  <div id="onboarding-tour" class="onboarding-tour" aria-hidden="true">
-    <div class="tour-overlay"></div>
-    <div class="tour-spotlight" id="tour-spotlight"></div>
-    <div class="tour-pointer" id="tour-pointer">
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
-      </svg>
-    </div>
-    <div class="tour-tooltip" id="tour-tooltip">
-      <div class="tour-tooltip-content">
-        <h4 id="tour-title">Welcome!</h4>
-        <p id="tour-tip">Let's get you started with KING SON♪C Pro!</p>
-      </div>
-      <div class="tour-actions">
-        <button id="tour-skip" class="tour-btn-skip">Skip Tour</button>
-        <button id="tour-next" class="tour-btn-next">Next →</button>
-      </div>
-      <div class="tour-progress" id="tour-progress">Step 1 of 6</div>
-    </div>
-  </div>
-
-  <!-- Enhanced PWA Install Card - Multi-State -->
-  <div id="install-card" class="install-card" aria-hidden="true">
-    <div class="install-card-backdrop"></div>
-    <div class="install-card-content">
-      <!-- Close button -->
-      <button id="install-dismiss" class="install-card-close" aria-label="Dismiss">✕</button>
-
-      <!-- State: Prompt (default) -->
-      <div class="install-state" id="install-state-prompt">
-        <div class="install-card-icon">
-          <img src="icons/icon-96x96.png" alt="King Sonic Pro" />
-          <div class="install-icon-glow"></div>
+    <div class="app-container">
+      <header class="synth-header">
+        <div class="logo-container">
+          <h1 class="brand-name">KING SON♪C <span class="accent">Pro</span></h1>
         </div>
-        <div class="install-card-header">
-          <h3>Install KING SON♪C Pro</h3>
-          <p>Get the full app experience with offline support!</p>
-        </div>
-        <ul class="install-features">
-          <li>🎹 Play piano anytime, anywhere</li>
-          <li>📱 Works offline</li>
-          <li>⚡ Lightning fast</li>
-        </ul>
-        <button id="install-btn" class="install-btn-primary">
-          <span class="install-btn-icon">📥</span>
-          <span>Install Now</span>
-        </button>
-      </div>
 
-      <!-- State: Installing -->
-      <div class="install-state hidden" id="install-state-installing">
-        <div class="install-progress-container">
-          <div class="install-progress-spinner"></div>
-          <div class="install-progress-bar">
-            <div class="install-progress-fill"></div>
+        <div class="theme-selector">
+          <label>Theme:</label>
+          <div class="theme-dots">
+            <button
+              class="dot orange active"
+              onclick="setTheme('orange')"
+            ></button>
+            <button class="dot purple" onclick="setTheme('purple')"></button>
+            <button class="dot red" onclick="setTheme('red')"></button>
+            <button class="dot black" onclick="setTheme('black')"></button>
           </div>
         </div>
-        <div class="install-card-header">
-          <h3>Installing...</h3>
-          <p>Setting up your premium piano experience</p>
+      </header>
+
+      <div class="visual-dashboard">
+        <div class="viz-left">
+          <div class="pressed-key-display">
+            <div class="pressed-key-letter" id="pressed-key-letter">&nbsp;</div>
+            <div class="pressed-key-note" id="pressed-key-note">&nbsp;</div>
+          </div>
+        </div>
+        <div class="viz-center viz-container">
+          <canvas id="visualizer" width="800" height="100"></canvas>
+          <div
+            id="viz-overlay"
+            class="viz-overlay"
+            aria-hidden="true"
+            role="status"
+            aria-live="polite"
+          >
+            <span>Welcome to</span>
+            <span>KING SON♪C Pro</span>
+          </div>
+        </div>
+        <div class="viz-right">
+          <div class="record-panel">
+            <div id="record-status">RECORD YOUR creativity!</div>
+            <div id="record-timer">00:00</div>
+          </div>
         </div>
       </div>
 
-      <!-- State: Success -->
-      <div class="install-state hidden" id="install-state-success">
-        <div class="install-success-icon">
-          <svg viewBox="0 0 52 52" class="checkmark">
-            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
-            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-          </svg>
+      <div class="dashboard">
+        <div class="control-group">
+          <label>Master Vol</label>
+          <input
+            type="range"
+            id="volume-slider"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.5"
+          />
         </div>
-        <div class="install-card-header">
-          <h3>Installation Complete! 🎉</h3>
-          <p>KING SON♪C Pro is ready to use</p>
+
+        <div class="control-group">
+          <label>Tone</label>
+          <div class="toggle-switch">
+            <button class="tone-btn active" data-type="triangle">Piano</button>
+            <button class="tone-btn" data-type="sawtooth">Synth</button>
+            <button class="tone-btn" data-type="square">Square</button>
+            <button class="tone-btn" data-type="sine">Sine</button>
+          </div>
         </div>
-        <button id="open-app-btn" class="install-btn-primary success">
-          <span class="install-btn-icon">🚀</span>
-          <span>Open App</span>
-        </button>
+
+        <div class="control-group">
+          <label>Octave</label>
+          <div class="octave-controls">
+            <button id="octave-down" class="octave-btn">−</button>
+            <span id="octave-display">C4</span>
+            <button id="octave-up" class="octave-btn">+</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>Power</label>
+          <div class="power-controls">
+            <button
+              id="power-toggle"
+              class="power-btn off"
+              aria-pressed="false"
+            >
+              Off
+            </button>
+            <span
+              id="power-indicator"
+              class="power-indicator off"
+              aria-hidden="true"
+            ></span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label>Record</label>
+          <div class="record-controls-pro">
+            <button
+              id="record-btn"
+              class="record-btn-pro"
+              title="Start Recording"
+            >
+              <span class="record-icon"></span>
+              <span class="record-ring"></span>
+            </button>
+            <button
+              id="stop-btn"
+              class="stop-btn-pro"
+              disabled
+              title="Stop Recording"
+            >
+              <span class="stop-icon"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label>Mic</label>
+          <div class="mic-controls">
+            <button
+              id="mic-toggle"
+              class="mic-btn off"
+              aria-pressed="false"
+              title="Enable microphone for voice recording"
+            >
+              🎤 Off
+            </button>
+            <span
+              id="mic-indicator"
+              class="mic-indicator off"
+              aria-hidden="true"
+            ></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="piano-wrapper">
+        <ul class="piano-keys-list" id="piano-keys">
+          <li class="key white" data-note="C" data-key="a"><span>A</span></li>
+          <li class="key black" data-note="C#" data-key="w"><span>W</span></li>
+          <li class="key white" data-note="D" data-key="s"><span>S</span></li>
+          <li class="key black" data-note="D#" data-key="e"><span>E</span></li>
+          <li class="key white" data-note="E" data-key="d"><span>D</span></li>
+          <li class="key white" data-note="F" data-key="f"><span>F</span></li>
+          <li class="key black" data-note="F#" data-key="t"><span>T</span></li>
+          <li class="key white" data-note="G" data-key="g"><span>G</span></li>
+          <li class="key black" data-note="G#" data-key="y"><span>Y</span></li>
+          <li class="key white" data-note="A" data-key="h"><span>H</span></li>
+          <li class="key black" data-note="A#" data-key="u"><span>U</span></li>
+          <li class="key white" data-note="B" data-key="j"><span>J</span></li>
+          <li
+            class="key white"
+            data-note="C"
+            data-key="k"
+            data-octave-shift="1"
+          >
+            <span>K</span>
+          </li>
+          <!-- Extra (higher) octave for extended range: octave-shift="2" -->
+          <li
+            class="key black"
+            data-note="C#"
+            data-octave-shift="2"
+            data-key="o"
+          >
+            <span>O</span>
+          </li>
+          <li
+            class="key white"
+            data-note="D"
+            data-octave-shift="2"
+            data-key="l"
+          >
+            <span>L</span>
+          </li>
+          <li
+            class="key black"
+            data-note="D#"
+            data-octave-shift="2"
+            data-key="p"
+          >
+            <span>P</span>
+          </li>
+          <li
+            class="key white"
+            data-note="E"
+            data-octave-shift="2"
+            data-key=";"
+          >
+            <span>;</span>
+          </li>
+          <li
+            class="key white"
+            data-note="F"
+            data-octave-shift="2"
+            data-key="'"
+          >
+            <span>'</span>
+          </li>
+          <li
+            class="key black"
+            data-note="F#"
+            data-octave-shift="2"
+            data-key="\\"
+          >
+            <span>\\</span>
+          </li>
+          <li
+            class="key white"
+            data-note="G"
+            data-octave-shift="2"
+            data-key="z"
+          >
+            <span>Z</span>
+          </li>
+          <li
+            class="key black"
+            data-note="G#"
+            data-octave-shift="2"
+            data-key="i"
+          >
+            <span>I</span>
+          </li>
+          <li
+            class="key white"
+            data-note="A"
+            data-octave-shift="2"
+            data-key="x"
+          >
+            <span>X</span>
+          </li>
+          <li
+            class="key black"
+            data-note="A#"
+            data-octave-shift="2"
+            data-key="m"
+          >
+            <span>M</span>
+          </li>
+          <li
+            class="key white"
+            data-note="B"
+            data-octave-shift="2"
+            data-key="c"
+          >
+            <span>C</span>
+          </li>
+          <li
+            class="key white"
+            data-note="C"
+            data-octave-shift="2"
+            data-key="v"
+          >
+            <span>V</span>
+          </li>
+        </ul>
       </div>
     </div>
-  </div>
 
-  <!-- Exit Intent Share Prompt - Shows when user is leaving -->
-  <div id="exit-share-prompt" class="exit-share-prompt" aria-hidden="true">
-    <div class="exit-share-backdrop"></div>
-    <div class="exit-share-card">
-      <button class="exit-share-close" aria-label="Close">&times;</button>
-
-      <div class="exit-share-emoji">🎹</div>
-
-      <h2 class="exit-share-title">Enjoyed Playing?</h2>
-      <p class="exit-share-subtitle">Share KING SON♪C Pro with your friends and let them experience the music too!</p>
-
-      <div class="exit-share-stats" id="exit-share-stats">
-        <div class="stat-item">
-          <span class="stat-value" id="stat-notes-played">0</span>
-          <span class="stat-label">Notes Played</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value" id="stat-session-time">0:00</span>
-          <span class="stat-label">Session Time</span>
-        </div>
+    <!-- First-Time User Onboarding Tour -->
+    <div id="onboarding-tour" class="onboarding-tour" aria-hidden="true">
+      <div class="tour-overlay"></div>
+      <div class="tour-spotlight" id="tour-spotlight"></div>
+      <div class="tour-pointer" id="tour-pointer">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+        </svg>
       </div>
+      <div class="tour-tooltip" id="tour-tooltip">
+        <div class="tour-tooltip-content">
+          <h4 id="tour-title">Welcome!</h4>
+          <p id="tour-tip">Let's get you started with KING SON♪C Pro!</p>
+        </div>
+        <div class="tour-actions">
+          <button id="tour-skip" class="tour-btn-skip">Skip Tour</button>
+          <button id="tour-next" class="tour-btn-next">Next →</button>
+        </div>
+        <div class="tour-progress" id="tour-progress">Step 1 of 6</div>
+      </div>
+    </div>
 
-      <div class="exit-share-buttons">
-        <button id="exit-share-native" class="exit-share-btn primary">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="18" cy="5" r="3" />
-            <circle cx="6" cy="12" r="3" />
-            <circle cx="18" cy="19" r="3" />
-            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-          </svg>
-          Share Now
+    <!-- Enhanced PWA Install Card - Multi-State -->
+    <div id="install-card" class="install-card" aria-hidden="true">
+      <div class="install-card-backdrop"></div>
+      <div class="install-card-content">
+        <!-- Close button -->
+        <button
+          id="install-dismiss"
+          class="install-card-close"
+          aria-label="Dismiss"
+        >
+          ✕
         </button>
-        <button id="exit-share-dismiss" class="exit-share-btn secondary">Maybe Later</button>
-      </div>
 
-      <div class="exit-share-social">
-        <p>Or share directly:</p>
-        <div class="exit-share-social-icons">
-          <a href="#" id="exit-share-whatsapp" class="social-icon whatsapp" title="WhatsApp">
-            <svg viewBox="0 0 24 24" fill="currentColor">
+        <!-- State: Prompt (default) -->
+        <div class="install-state" id="install-state-prompt">
+          <div class="install-card-icon">
+            <img src="icons/icon-96x96.png" alt="King Sonic Pro" />
+            <div class="install-icon-glow"></div>
+          </div>
+          <div class="install-card-header">
+            <h3>Install KING SON♪C Pro</h3>
+            <p>Get the full app experience with offline support!</p>
+          </div>
+          <ul class="install-features">
+            <li>🎹 Play piano anytime, anywhere</li>
+            <li>📱 Works offline</li>
+            <li>⚡ Lightning fast</li>
+          </ul>
+          <button id="install-btn" class="install-btn-primary">
+            <span class="install-btn-icon">📥</span>
+            <span>Install Now</span>
+          </button>
+        </div>
+
+        <!-- State: Installing -->
+        <div class="install-state hidden" id="install-state-installing">
+          <div class="install-progress-container">
+            <div class="install-progress-spinner"></div>
+            <div class="install-progress-bar">
+              <div class="install-progress-fill"></div>
+            </div>
+          </div>
+          <div class="install-card-header">
+            <h3>Installing...</h3>
+            <p>Setting up your premium piano experience</p>
+          </div>
+        </div>
+
+        <!-- State: Success -->
+        <div class="install-state hidden" id="install-state-success">
+          <div class="install-success-icon">
+            <svg viewBox="0 0 52 52" class="checkmark">
+              <circle
+                class="checkmark-circle"
+                cx="26"
+                cy="26"
+                r="25"
+                fill="none"
+              />
               <path
-                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                class="checkmark-check"
+                fill="none"
+                d="M14.1 27.2l7.1 7.2 16.7-16.8"
+              />
             </svg>
-          </a>
-          <a href="#" id="exit-share-twitter" class="social-icon twitter" title="Twitter/X">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-            </svg>
-          </a>
-          <a href="#" id="exit-share-facebook" class="social-icon facebook" title="Facebook">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-            </svg>
-          </a>
-          <a href="#" id="exit-share-copy" class="social-icon copy" title="Copy Link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-            </svg>
-          </a>
+          </div>
+          <div class="install-card-header">
+            <h3>Installation Complete! 🎉</h3>
+            <p>KING SON♪C Pro is ready to use</p>
+          </div>
+          <button id="open-app-btn" class="install-btn-primary success">
+            <span class="install-btn-icon">🚀</span>
+            <span>Open App</span>
+          </button>
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="script.js"></script>
+    <!-- Exit Intent Share Prompt - Shows when user is leaving -->
+    <div id="exit-share-prompt" class="exit-share-prompt" aria-hidden="true">
+      <div class="exit-share-backdrop"></div>
+      <div class="exit-share-card">
+        <button class="exit-share-close" aria-label="Close">&times;</button>
 
-  <!-- Service Worker & PWA Install Prompt -->
-  <script>
-    // ===========================================
-    // SERVICE WORKER REGISTRATION
-    // ===========================================
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((registration) => {
-            console.log('✅ Service Worker registered successfully:', registration.scope);
+        <div class="exit-share-emoji">🎹</div>
 
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              console.log('🔄 New Service Worker found, installing...');
+        <h2 class="exit-share-title">Enjoyed Playing?</h2>
+        <p class="exit-share-subtitle">
+          Share KING SON♪C Pro with your friends and let them experience the
+          music too!
+        </p>
 
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('📦 New content available, please refresh!');
-                }
+        <div class="exit-share-stats" id="exit-share-stats">
+          <div class="stat-item">
+            <span class="stat-value" id="stat-notes-played">0</span>
+            <span class="stat-label">Notes Played</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-session-time">0:00</span>
+            <span class="stat-label">Session Time</span>
+          </div>
+        </div>
+
+        <div class="exit-share-buttons">
+          <button id="exit-share-native" class="exit-share-btn primary">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
+            Share Now
+          </button>
+          <button id="exit-share-dismiss" class="exit-share-btn secondary">
+            Maybe Later
+          </button>
+        </div>
+
+        <div class="exit-share-social">
+          <p>Or share directly:</p>
+          <div class="exit-share-social-icons">
+            <a
+              href="#"
+              id="exit-share-whatsapp"
+              class="social-icon whatsapp"
+              title="WhatsApp"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+                />
+              </svg>
+            </a>
+            <a
+              href="#"
+              id="exit-share-twitter"
+              class="social-icon twitter"
+              title="Twitter/X"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                />
+              </svg>
+            </a>
+            <a
+              href="#"
+              id="exit-share-facebook"
+              class="social-icon facebook"
+              title="Facebook"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                />
+              </svg>
+            </a>
+            <a
+              href="#"
+              id="exit-share-copy"
+              class="social-icon copy"
+              title="Copy Link"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+
+    <!-- Service Worker & PWA Install Prompt -->
+    <script>
+      // ===========================================
+      // SERVICE WORKER REGISTRATION
+      // ===========================================
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("./sw.js")
+            .then((registration) => {
+              console.log(
+                "✅ Service Worker registered successfully:",
+                registration.scope
+              );
+
+              registration.addEventListener("updatefound", () => {
+                const newWorker = registration.installing;
+                console.log("🔄 New Service Worker found, installing...");
+
+                newWorker.addEventListener("statechange", () => {
+                  if (
+                    newWorker.state === "installed" &&
+                    navigator.serviceWorker.controller
+                  ) {
+                    console.log("📦 New content available, please refresh!");
+                  }
+                });
               });
+            })
+            .catch((error) => {
+              console.error("❌ Service Worker registration failed:", error);
             });
-          })
-          .catch((error) => {
-            console.error('❌ Service Worker registration failed:', error);
-          });
-      });
-    }
-
-    // ===========================================
-    // PWA INSTALL PROMPT - AGGRESSIVE Immediate Install Experience
-    // ===========================================
-    (function () {
-      let deferredPrompt = null;
-      let installPromptReady = false;
-      let installCardShownCount = 0;
-
-      // DOM Elements for install card
-      const installCard = document.getElementById('install-card');
-      const installBtn = document.getElementById('install-btn');
-      const installDismiss = document.getElementById('install-dismiss');
-      const openAppBtn = document.getElementById('open-app-btn');
-
-      // State elements
-      const statePrompt = document.getElementById('install-state-prompt');
-      const stateInstalling = document.getElementById('install-state-installing');
-      const stateSuccess = document.getElementById('install-state-success');
-
-      if (!installCard) return;
-
-      // Check if already installed (comprehensive check)
-      const isInstalled = () => {
-        return window.matchMedia('(display-mode: standalone)').matches ||
-          window.matchMedia('(display-mode: fullscreen)').matches ||
-          window.matchMedia('(display-mode: minimal-ui)').matches ||
-          window.navigator.standalone === true ||
-          document.referrer.includes('android-app://') ||
-          localStorage.getItem('appInstalled') === 'true';
-      };
-
-      // AGGRESSIVE: Shorter dismiss time (2 hours instead of 12)
-      const isCardDismissed = () => {
-        const dismissUntil = localStorage.getItem('installCardDismissed');
-        if (!dismissUntil) return false;
-        if (Date.now() > parseInt(dismissUntil, 10)) {
-          localStorage.removeItem('installCardDismissed');
-          return false;
-        }
-        return true;
-      };
-
-      // Detect iOS/Safari
-      const isIOS = () => {
-        return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      };
-
-      const isSafari = () => {
-        return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-      };
-
-      // Switch to a specific state
-      const switchToState = (stateName) => {
-        [statePrompt, stateInstalling, stateSuccess].forEach(el => {
-          if (el) el.classList.add('hidden');
         });
+      }
 
-        if (stateName === 'prompt' && statePrompt) statePrompt.classList.remove('hidden');
-        if (stateName === 'installing' && stateInstalling) stateInstalling.classList.remove('hidden');
-        if (stateName === 'success' && stateSuccess) stateSuccess.classList.remove('hidden');
-      };
+      // ===========================================
+      // PWA INSTALL PROMPT - AGGRESSIVE Immediate Install Experience
+      // ===========================================
+      (function () {
+        let deferredPrompt = null;
+        let installPromptReady = false;
+        let installCardShownCount = 0;
 
-      // Show the install card IMMEDIATELY AND AGGRESSIVELY
-      const showInstallCard = () => {
-        if (!installCard || isInstalled()) {
-          console.log('📲 Install card skipped - already installed');
-          return;
-        }
+        // DOM Elements for install card
+        const installCard = document.getElementById("install-card");
+        const installBtn = document.getElementById("install-btn");
+        const installDismiss = document.getElementById("install-dismiss");
+        const openAppBtn = document.getElementById("open-app-btn");
 
-        // AGGRESSIVE: Show even if dismissed, but track count
-        installCardShownCount++;
-        console.log('📲 AGGRESSIVELY showing install card (count: ' + installCardShownCount + ')');
-        
-        switchToState('prompt');
-        installCard.classList.add('visible');
-        installCard.setAttribute('aria-hidden', 'false');
+        // State elements
+        const statePrompt = document.getElementById("install-state-prompt");
+        const stateInstalling = document.getElementById(
+          "install-state-installing"
+        );
+        const stateSuccess = document.getElementById("install-state-success");
 
-        // Add entrance animation with bounce
-        installCard.style.animation = 'slideInUp 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
-        
-        // AGGRESSIVE: Add pulsing attention effect
-        setTimeout(() => {
-          if (installBtn) {
-            installBtn.style.animation = 'pulse 1.5s ease-in-out infinite';
-          }
-        }, 1000);
-      };
-
-      // Hide the install card
-      const hideInstallCard = () => {
         if (!installCard) return;
-        installCard.classList.remove('visible');
-        installCard.setAttribute('aria-hidden', 'true');
-        if (installBtn) installBtn.style.animation = '';
-      };
 
-      // Show success state with celebration
-      const showInstallSuccess = () => {
-        switchToState('success');
-        localStorage.setItem('appInstalled', 'true');
+        // Check if already installed (comprehensive check)
+        const isInstalled = () => {
+          return (
+            window.matchMedia("(display-mode: standalone)").matches ||
+            window.matchMedia("(display-mode: fullscreen)").matches ||
+            window.matchMedia("(display-mode: minimal-ui)").matches ||
+            window.navigator.standalone === true ||
+            document.referrer.includes("android-app://") ||
+            localStorage.getItem("appInstalled") === "true"
+          );
+        };
 
-        // Trigger confetti-like celebration in the visualizer
-        if (typeof showVizOverlay === 'function') {
-          showVizOverlay('🎉 Installed!\nKING SON♪C Pro is ready');
-        }
-
-        // Auto-hide after 5 seconds if user doesn't click "Open App"
-        setTimeout(() => {
-          if (installCard.classList.contains('visible') && stateSuccess && !stateSuccess.classList.contains('hidden')) {
-            hideInstallCard();
+        // AGGRESSIVE: Shorter dismiss time (2 hours instead of 12)
+        const isCardDismissed = () => {
+          const dismissUntil = localStorage.getItem("installCardDismissed");
+          if (!dismissUntil) return false;
+          if (Date.now() > parseInt(dismissUntil, 10)) {
+            localStorage.removeItem("installCardDismissed");
+            return false;
           }
-        }, 5000);
-      };
+          return true;
+        };
 
-      // iOS-specific install instructions modal
-      const showIOSInstructions = () => {
-        const modal = document.createElement('div');
-        modal.className = 'ios-install-modal';
-        modal.innerHTML = `
+        // Detect iOS/Safari
+        const isIOS = () => {
+          return (
+            /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+          );
+        };
+
+        const isSafari = () => {
+          return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        };
+
+        // Switch to a specific state
+        const switchToState = (stateName) => {
+          [statePrompt, stateInstalling, stateSuccess].forEach((el) => {
+            if (el) el.classList.add("hidden");
+          });
+
+          if (stateName === "prompt" && statePrompt)
+            statePrompt.classList.remove("hidden");
+          if (stateName === "installing" && stateInstalling)
+            stateInstalling.classList.remove("hidden");
+          if (stateName === "success" && stateSuccess)
+            stateSuccess.classList.remove("hidden");
+        };
+
+        // Show the install card IMMEDIATELY AND AGGRESSIVELY
+        const showInstallCard = () => {
+          if (!installCard || isInstalled()) {
+            console.log("📲 Install card skipped - already installed");
+            return;
+          }
+
+          // AGGRESSIVE: Show even if dismissed, but track count
+          installCardShownCount++;
+          console.log(
+            "📲 AGGRESSIVELY showing install card (count: " +
+              installCardShownCount +
+              ")"
+          );
+
+          switchToState("prompt");
+          installCard.classList.add("visible");
+          installCard.setAttribute("aria-hidden", "false");
+
+          // Add entrance animation with bounce
+          installCard.style.animation =
+            "slideInUp 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards";
+
+          // AGGRESSIVE: Add pulsing attention effect
+          setTimeout(() => {
+            if (installBtn) {
+              installBtn.style.animation = "pulse 1.5s ease-in-out infinite";
+            }
+          }, 1000);
+        };
+
+        // Hide the install card
+        const hideInstallCard = () => {
+          if (!installCard) return;
+          installCard.classList.remove("visible");
+          installCard.setAttribute("aria-hidden", "true");
+          if (installBtn) installBtn.style.animation = "";
+        };
+
+        // Show success state with celebration
+        const showInstallSuccess = () => {
+          switchToState("success");
+          localStorage.setItem("appInstalled", "true");
+
+          // Trigger confetti-like celebration in the visualizer
+          if (typeof showVizOverlay === "function") {
+            showVizOverlay("🎉 Installed!\nKING SON♪C Pro is ready");
+          }
+
+          // Auto-hide after 5 seconds if user doesn't click "Open App"
+          setTimeout(() => {
+            if (
+              installCard.classList.contains("visible") &&
+              stateSuccess &&
+              !stateSuccess.classList.contains("hidden")
+            ) {
+              hideInstallCard();
+            }
+          }, 5000);
+        };
+
+        // iOS-specific install instructions modal
+        const showIOSInstructions = () => {
+          const modal = document.createElement("div");
+          modal.className = "ios-install-modal";
+          modal.innerHTML = `
           <div class="ios-install-backdrop"></div>
           <div class="ios-install-content">
             <button class="ios-install-close">&times;</button>
@@ -556,13 +793,13 @@
             <button class="ios-install-done">Got it!</button>
           </div>
         `;
-        document.body.appendChild(modal);
+          document.body.appendChild(modal);
 
-        // Add styles dynamically
-        if (!document.getElementById('ios-install-styles')) {
-          const style = document.createElement('style');
-          style.id = 'ios-install-styles';
-          style.textContent = `
+          // Add styles dynamically
+          if (!document.getElementById("ios-install-styles")) {
+            const style = document.createElement("style");
+            style.id = "ios-install-styles";
+            style.textContent = `
             .ios-install-modal { position: fixed; inset: 0; z-index: 999999; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
             .ios-install-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
             .ios-install-content { position: relative; background: linear-gradient(145deg, #2d2d2d, #1a1a1a); border-radius: 20px; padding: 28px 24px; max-width: 340px; width: calc(100% - 40px); box-shadow: 0 25px 50px rgba(0,0,0,0.5); animation: slideUp 0.4s ease; }
@@ -579,147 +816,173 @@
             .ios-install-note { font-size: 0.85rem; color: #888; text-align: center; margin: 0 0 16px 0; }
             .ios-install-done { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary-color, #ff6b35), #e55a2b); color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; }
           `;
-          document.head.appendChild(style);
-        }
-
-        // Close handlers
-        modal.querySelector('.ios-install-backdrop').addEventListener('click', () => modal.remove());
-        modal.querySelector('.ios-install-close').addEventListener('click', () => modal.remove());
-        modal.querySelector('.ios-install-done').addEventListener('click', () => {
-          modal.remove();
-          hideInstallCard();
-        });
-      };
-
-      // CRITICAL: Listen for the beforeinstallprompt event IMMEDIATELY
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installPromptReady = true;
-        console.log('📲 beforeinstallprompt captured! Showing install card IMMEDIATELY...');
-
-        // AGGRESSIVE: Show immediately when prompt is available, ignore dismiss
-        showInstallCard();
-      });
-
-      // Install button click handler
-      if (installBtn) {
-        installBtn.addEventListener('click', async () => {
-          console.log('🔘 Install button clicked');
-
-          // iOS needs special handling
-          if (isIOS()) {
-            showIOSInstructions();
-            return;
+            document.head.appendChild(style);
           }
 
-          if (!deferredPrompt) {
-            console.log('❌ No install prompt available');
-            // For non-iOS browsers without prompt
-            alert('To install this app:\n\n• Look for the install icon (⊕) in your browser\'s address bar\n• Or open the browser menu and select "Install app"');
-            return;
-          }
-
-          // Switch to installing state
-          switchToState('installing');
-          console.log('📲 Triggering install prompt...');
-
-          try {
-            // Show the install prompt
-            deferredPrompt.prompt();
-
-            // Wait for the user's response
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`📲 User ${outcome === 'accepted' ? 'ACCEPTED' : 'DISMISSED'} the install prompt`);
-
-            if (outcome === 'accepted') {
-              showInstallSuccess();
-            } else {
-              // User dismissed, hide the card but show again soon
+          // Close handlers
+          modal
+            .querySelector(".ios-install-backdrop")
+            .addEventListener("click", () => modal.remove());
+          modal
+            .querySelector(".ios-install-close")
+            .addEventListener("click", () => modal.remove());
+          modal
+            .querySelector(".ios-install-done")
+            .addEventListener("click", () => {
+              modal.remove();
               hideInstallCard();
-            }
-          } catch (err) {
-            console.error('Install prompt error:', err);
-            switchToState('prompt');
-          }
+            });
+        };
 
-          // Clear the deferred prompt - it can only be used once
-          deferredPrompt = null;
-        });
-      }
+        // CRITICAL: Listen for the beforeinstallprompt event IMMEDIATELY
+        window.addEventListener("beforeinstallprompt", (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          installPromptReady = true;
+          console.log(
+            "📲 beforeinstallprompt captured! Showing install card IMMEDIATELY..."
+          );
 
-      // Dismiss button click handler - AGGRESSIVE: Short dismiss time
-      if (installDismiss) {
-        installDismiss.addEventListener('click', () => {
-          hideInstallCard();
-          // AGGRESSIVE: Only dismiss for 2 hours (instead of 12)
-          const dismissUntil = Date.now() + (2 * 60 * 60 * 1000);
-          localStorage.setItem('installCardDismissed', dismissUntil.toString());
-          console.log('📲 Install card dismissed for 2 hours only');
-        });
-      }
-
-      // Open App button - closes card with celebration
-      if (openAppBtn) {
-        openAppBtn.addEventListener('click', () => {
-          hideInstallCard();
-          if (typeof showVizOverlay === 'function') {
-            showVizOverlay('Welcome!\nEnjoy KING SON♪C Pro 🎹');
-          }
-        });
-      }
-
-      // Handle successful installation
-      window.addEventListener('appinstalled', () => {
-        console.log('🎉 PWA installed successfully!');
-        showInstallSuccess();
-      });
-
-      // AGGRESSIVE IMMEDIATE SHOW: Show install card as soon as page loads
-      // Show for ALL browsers immediately, don't wait
-      setTimeout(() => {
-        if (!isInstalled()) {
-          if (isIOS()) {
-            // iOS doesn't fire beforeinstallprompt, show immediately
-            console.log('📲 iOS detected - showing install card IMMEDIATELY');
-            if (!isCardDismissed()) showInstallCard();
-          } else if (!isCardDismissed()) {
-            // For Chrome/Edge, show card even before beforeinstallprompt fires
-            // The button will handle the case when prompt isn't ready
-            console.log('📲 Showing install card AGGRESSIVELY on load');
-            showInstallCard();
-          }
-        }
-      }, 300); // Very short delay - show almost immediately
-
-      // AGGRESSIVE: Re-show after user interaction if not installed
-      let interactionCount = 0;
-      document.addEventListener('click', () => {
-        interactionCount++;
-        // After 10 clicks, if not installed and card not visible, show again
-        if (interactionCount === 10 && !isInstalled() && !installCard.classList.contains('visible')) {
-          console.log('📲 Re-showing install card after user engagement');
+          // AGGRESSIVE: Show immediately when prompt is available, ignore dismiss
           showInstallCard();
-        }
-      }, { passive: true });
+        });
 
-      // Listen for display mode changes (user might install while on the page)
-      window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
-        if (e.matches) {
-          console.log('📲 App is now running in standalone mode!');
+        // Install button click handler
+        if (installBtn) {
+          installBtn.addEventListener("click", async () => {
+            console.log("🔘 Install button clicked");
+
+            // iOS needs special handling
+            if (isIOS()) {
+              showIOSInstructions();
+              return;
+            }
+
+            if (!deferredPrompt) {
+              console.log("❌ No install prompt available");
+              // For non-iOS browsers without prompt
+              alert(
+                'To install this app:\n\n• Look for the install icon (⊕) in your browser\'s address bar\n• Or open the browser menu and select "Install app"'
+              );
+              return;
+            }
+
+            // Switch to installing state
+            switchToState("installing");
+            console.log("📲 Triggering install prompt...");
+
+            try {
+              // Show the install prompt
+              deferredPrompt.prompt();
+
+              // Wait for the user's response
+              const { outcome } = await deferredPrompt.userChoice;
+              console.log(
+                `📲 User ${
+                  outcome === "accepted" ? "ACCEPTED" : "DISMISSED"
+                } the install prompt`
+              );
+
+              if (outcome === "accepted") {
+                showInstallSuccess();
+              } else {
+                // User dismissed, hide the card but show again soon
+                hideInstallCard();
+              }
+            } catch (err) {
+              console.error("Install prompt error:", err);
+              switchToState("prompt");
+            }
+
+            // Clear the deferred prompt - it can only be used once
+            deferredPrompt = null;
+          });
+        }
+
+        // Dismiss button click handler - AGGRESSIVE: Short dismiss time
+        if (installDismiss) {
+          installDismiss.addEventListener("click", () => {
+            hideInstallCard();
+            // AGGRESSIVE: Only dismiss for 2 hours (instead of 12)
+            const dismissUntil = Date.now() + 2 * 60 * 60 * 1000;
+            localStorage.setItem(
+              "installCardDismissed",
+              dismissUntil.toString()
+            );
+            console.log("📲 Install card dismissed for 2 hours only");
+          });
+        }
+
+        // Open App button - closes card with celebration
+        if (openAppBtn) {
+          openAppBtn.addEventListener("click", () => {
+            hideInstallCard();
+            if (typeof showVizOverlay === "function") {
+              showVizOverlay("Welcome!\nEnjoy KING SON♪C Pro 🎹");
+            }
+          });
+        }
+
+        // Handle successful installation
+        window.addEventListener("appinstalled", () => {
+          console.log("🎉 PWA installed successfully!");
           showInstallSuccess();
-        }
-      });
+        });
 
-      // Log install prompt status for debugging
-      console.log('📲 PWA Install System initialized (AGGRESSIVE MODE)', {
-        isInstalled: isInstalled(),
-        isCardDismissed: isCardDismissed(),
-        isIOS: isIOS(),
-        isSafari: isSafari()
-      });
-    })();
-  </script>
-</body>
+        // AGGRESSIVE IMMEDIATE SHOW: Show install card as soon as page loads
+        // Show for ALL browsers immediately, don't wait
+        setTimeout(() => {
+          if (!isInstalled()) {
+            if (isIOS()) {
+              // iOS doesn't fire beforeinstallprompt, show immediately
+              console.log("📲 iOS detected - showing install card IMMEDIATELY");
+              if (!isCardDismissed()) showInstallCard();
+            } else if (!isCardDismissed()) {
+              // For Chrome/Edge, show card even before beforeinstallprompt fires
+              // The button will handle the case when prompt isn't ready
+              console.log("📲 Showing install card AGGRESSIVELY on load");
+              showInstallCard();
+            }
+          }
+        }, 300); // Very short delay - show almost immediately
 
+        // AGGRESSIVE: Re-show after user interaction if not installed
+        let interactionCount = 0;
+        document.addEventListener(
+          "click",
+          () => {
+            interactionCount++;
+            // After 10 clicks, if not installed and card not visible, show again
+            if (
+              interactionCount === 10 &&
+              !isInstalled() &&
+              !installCard.classList.contains("visible")
+            ) {
+              console.log("📲 Re-showing install card after user engagement");
+              showInstallCard();
+            }
+          },
+          { passive: true }
+        );
+
+        // Listen for display mode changes (user might install while on the page)
+        window
+          .matchMedia("(display-mode: standalone)")
+          .addEventListener("change", (e) => {
+            if (e.matches) {
+              console.log("📲 App is now running in standalone mode!");
+              showInstallSuccess();
+            }
+          });
+
+        // Log install prompt status for debugging
+        console.log("📲 PWA Install System initialized (AGGRESSIVE MODE)", {
+          isInstalled: isInstalled(),
+          isCardDismissed: isCardDismissed(),
+          isIOS: isIOS(),
+          isSafari: isSafari(),
+        });
+      })();
+    </script>
+  </body>
 </html>
