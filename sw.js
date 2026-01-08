@@ -2,7 +2,7 @@
 // Cache First, Network Fallback Strategy
 // GitHub Pages compatible with relative paths
 
-const CACHE_NAME = 'king-sonic-pro-v5';
+const CACHE_NAME = 'king-sonic-pro-v6';
 
 // Get the base path dynamically for GitHub Pages support
 const getBasePath = () => {

@@ -724,7 +724,7 @@ window.setTheme = function (themeName) {
   async function handleNativeShare() {
     const shareData = {
       title: 'KING SON♪C Pro',
-      text: `🎹 I just played ${notesPlayedCount} notes on KING SON♪C Pro! Try this amazing web piano - Premium Performance • Built with Passion • Built For You!`,
+      text: `🎹 I just played ${notesPlayedCount} notes on KING SON♪C Pro! Try this amazing Mobile Piano - Premium Performance • Built with Passion • Built For You!`,
       url: window.location.href
     };
 
