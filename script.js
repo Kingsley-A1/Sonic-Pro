@@ -79,6 +79,9 @@ function updateKeyboardScaling() {
   if (isMobile) {
     list.style.transform = "";
     list.style.width = "max-content";
+    const whiteKeyHeight = parseFloat(getComputedStyle(whiteKeys[0]).height);
+    // Ensure the wrapper is tall enough so labels are not clipped.
+    wrapper.style.minHeight = Math.max(whiteKeyHeight + 18, 140) + "px";
     wrapper.style.height = "";
     resizeVisualizerCanvas();
     return;

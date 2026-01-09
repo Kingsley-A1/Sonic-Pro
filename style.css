@@ -777,6 +777,8 @@ input[type="range"] {
 @media (max-width: 900px) {
   .piano-wrapper {
     justify-content: flex-start;
+    overflow-y: visible;
+    min-height: calc(var(--white-key-height) + 24px);
   }
 
   .piano-keys-list {
@@ -1060,7 +1062,7 @@ input[disabled] {
 @media (max-width: 480px) {
   :root {
     --white-key-width: 44px;
-    --white-key-height: 150px;
+    --white-key-height: 152px;
     --black-key-width: 29px;
     --black-key-height: 90px;
   }
@@ -1164,13 +1166,14 @@ input[disabled] {
   }
 
   .piano-wrapper {
-    padding: 6px 2px;
+    padding: 8px 4px;
+    min-height: calc(var(--white-key-height) + 24px);
   }
 
   .key.white span,
   .key.black span {
-    font-size: 0.6rem;
-    padding-bottom: 4px;
+    font-size: 0.62rem;
+    padding-bottom: 6px;
   }
 }
 
@@ -1178,9 +1181,9 @@ input[disabled] {
 @media (max-width: 375px) {
   :root {
     --white-key-width: 40px;
-    --white-key-height: 135px;
+    --white-key-height: 140px;
     --black-key-width: 26px;
-    --black-key-height: 81px;
+    --black-key-height: 84px;
   }
 
   .app-container {
@@ -1282,14 +1285,15 @@ input[disabled] {
   }
 
   .piano-wrapper {
-    padding: 5px 2px;
+    padding: 7px 3px;
     border-radius: 5px;
+    min-height: calc(var(--white-key-height) + 22px);
   }
 
   .key.white span,
   .key.black span {
-    font-size: 0.55rem;
-    padding-bottom: 3px;
+    font-size: 0.58rem;
+    padding-bottom: 5px;
   }
 }
 
@@ -1297,9 +1301,9 @@ input[disabled] {
 @media (max-width: 320px) {
   :root {
     --white-key-width: 36px;
-    --white-key-height: 120px;
+    --white-key-height: 126px;
     --black-key-width: 24px;
-    --black-key-height: 72px;
+    --black-key-height: 76px;
   }
 
   .app-container {
@@ -1393,13 +1397,14 @@ input[disabled] {
   }
 
   .piano-wrapper {
-    padding: 4px 1px;
+    padding: 6px 2px;
+    min-height: calc(var(--white-key-height) + 18px);
   }
 
   .key.white span,
   .key.black span {
-    font-size: 0.5rem;
-    padding-bottom: 2px;
+    font-size: 0.54rem;
+    padding-bottom: 4px;
   }
 }
 

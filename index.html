@@ -1061,22 +1061,33 @@
           showInstallSuccess();
         });
 
-        // AGGRESSIVE IMMEDIATE SHOW: Show install card as soon as page loads
-        // Show for ALL browsers immediately, don't wait
+        // AGGRESSIVE IMMEDIATE SHOW: fire right after JS is ready (no delay)
         setTimeout(() => {
-          if (!isInstalled()) {
+          if (!isInstalled() && !isCardDismissed()) {
             if (isIOS()) {
-              // iOS doesn't fire beforeinstallprompt, show immediately
               console.log("📲 iOS detected - showing install card IMMEDIATELY");
-              if (!isCardDismissed()) showInstallCard();
-            } else if (!isCardDismissed()) {
-              // For Chrome/Edge, show card even before beforeinstallprompt fires
-              // The button will handle the case when prompt isn't ready
+              showInstallCard();
+            } else {
               console.log("📲 Showing install card AGGRESSIVELY on load");
               showInstallCard();
             }
           }
-        }, 300); // Very short delay - show almost immediately
+        }, 0);
+
+        // Re-engage the prompt after swipe-to-close or app switching: when the
+        // page becomes visible again (e.g., user aborted a swipe/gesture), re-show
+        // if not installed and not dismissed.
+        document.addEventListener("visibilitychange", () => {
+          if (
+            document.visibilityState === "visible" &&
+            !isInstalled() &&
+            !installCard.classList.contains("visible") &&
+            !isCardDismissed()
+          ) {
+            console.log("📲 Re-showing install card on return/visibilitychange");
+            showInstallCard();
+          }
+        });
 
         // AGGRESSIVE: Re-show after user interaction if not installed
         let interactionCount = 0;
