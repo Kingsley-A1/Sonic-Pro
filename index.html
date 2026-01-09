@@ -68,7 +68,7 @@
     <meta itemprop="name" content="KING SON♪C Pro - Premium Mobile Piano" />
     <meta
       itemprop="description"
-      content="Premium Performance • Built with Passion • Built For You! 🎹"
+      content="Premium Performance • Built with Passion • Built For You! "
     />
     <meta
       itemprop="image"
@@ -85,7 +85,7 @@
     />
     <meta
       name="twitter:description"
-      content="Premium Performance • Built with Passion • Built For You! 🎹"
+      content="Premium Performance • Built with Passion • Built For You!"
     />
     <meta
       name="twitter:image"
@@ -730,6 +730,7 @@
         let deferredPrompt = null;
         let installPromptReady = false;
         let installCardShownCount = 0;
+        let installPromptWaiters = [];
 
         // DOM Elements for install card
         const installCard = document.getElementById("install-card");
@@ -935,40 +936,69 @@
             "📲 beforeinstallprompt captured! Showing install card IMMEDIATELY..."
           );
 
+          // Resolve any pending waits for the prompt
+          if (installPromptWaiters.length) {
+            installPromptWaiters.forEach(({ resolve, timer }) => {
+              clearTimeout(timer);
+              resolve(deferredPrompt);
+            });
+            installPromptWaiters = [];
+          }
+
           // AGGRESSIVE: Show immediately when prompt is available, ignore dismiss
           showInstallCard();
         });
+
+        // Wait for a deferred prompt to become available (non-iOS). We avoid
+        // showing “how to install” instructions here per UX request.
+        const waitForDeferredPrompt = (timeoutMs = 2500) => {
+          if (deferredPrompt) return Promise.resolve(deferredPrompt);
+          return new Promise((resolve) => {
+            const timer = setTimeout(() => {
+              // Remove this waiter if still present
+              installPromptWaiters = installPromptWaiters.filter(
+                (w) => w.resolve !== resolve
+              );
+              resolve(null);
+            }, timeoutMs);
+            installPromptWaiters.push({ resolve, timer });
+          });
+        };
+
+        // Shared installer
+        const runNativeInstallPrompt = async () => {
+          // iOS needs special handling
+          if (isIOS()) {
+            showIOSInstructions();
+            return { outcome: "ios" };
+          }
+
+          // If prompt isn't ready yet, wait briefly for it
+          if (!deferredPrompt) {
+            const prompt = await waitForDeferredPrompt(2500);
+            if (!prompt) {
+              return { outcome: "unavailable" };
+            }
+          }
+
+          // Show the install prompt
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          deferredPrompt = null;
+          return { outcome };
+        };
 
         // Install button click handler
         if (installBtn) {
           installBtn.addEventListener("click", async () => {
             console.log("🔘 Install button clicked");
 
-            // iOS needs special handling
-            if (isIOS()) {
-              showIOSInstructions();
-              return;
-            }
-
-            if (!deferredPrompt) {
-              console.log("❌ No install prompt available");
-              // For non-iOS browsers without prompt
-              alert(
-                'To install this app:\n\n• Look for the install icon (⊕) in your browser\'s address bar\n• Or open the browser menu and select "Install app"'
-              );
-              return;
-            }
-
             // Switch to installing state
             switchToState("installing");
             console.log("📲 Triggering install prompt...");
 
             try {
-              // Show the install prompt
-              deferredPrompt.prompt();
-
-              // Wait for the user's response
-              const { outcome } = await deferredPrompt.userChoice;
+              const { outcome } = await runNativeInstallPrompt();
               console.log(
                 `📲 User ${
                   outcome === "accepted" ? "ACCEPTED" : "DISMISSED"
@@ -978,16 +1008,26 @@
               if (outcome === "accepted") {
                 showInstallSuccess();
               } else {
-                // User dismissed, hide the card but show again soon
-                hideInstallCard();
+                if (outcome === "unavailable") {
+                  // Prompt not available yet (or unsupported) — return to prompt state without instructions
+                  switchToState("prompt");
+                  if (typeof showVizOverlay === "function") {
+                    showVizOverlay(
+                      "Install not available yet\nTry again in a moment"
+                    );
+                  }
+                } else if (outcome === "ios") {
+                  // iOS instructions modal is shown; keep card visible until user closes it
+                  switchToState("prompt");
+                } else {
+                  // User dismissed
+                  hideInstallCard();
+                }
               }
             } catch (err) {
               console.error("Install prompt error:", err);
               switchToState("prompt");
             }
-
-            // Clear the deferred prompt - it can only be used once
-            deferredPrompt = null;
           });
         }
 
@@ -1148,25 +1188,23 @@
               return;
             }
 
-            if (!deferredPrompt) {
-              hideLandscapeBanner(true);
-              alert(
-                'To install this app:\n\n• Look for the install icon (⊕) in your browser\'s address bar\n• Or open the browser menu and select "Install app"'
-              );
-              return;
-            }
-
             try {
-              deferredPrompt.prompt();
-              const { outcome } = await deferredPrompt.userChoice;
+              const { outcome } = await runNativeInstallPrompt();
               if (outcome === "accepted") {
                 hideLandscapeBanner(true);
                 showInstallSuccess();
+              } else if (outcome === "unavailable") {
+                // Quiet failure: no instructions, just close banner
+                hideLandscapeBanner(true);
+                if (typeof showVizOverlay === "function") {
+                  showVizOverlay(
+                    "Install not available yet\nTry again shortly"
+                  );
+                }
               }
             } catch (err) {
               console.error("Landscape install error:", err);
             }
-            deferredPrompt = null;
           });
         }
 

@@ -773,6 +773,19 @@ input[type="range"] {
   /* stretch to fill available space */
 }
 
+/* Mobile: avoid end-gaps + avoid over-scaling (JS also disables scaling on mobile) */
+@media (max-width: 900px) {
+  .piano-wrapper {
+    justify-content: flex-start;
+  }
+
+  .piano-keys-list {
+    width: max-content;
+    justify-content: flex-start;
+    transform-origin: left center;
+  }
+}
+
 .key {
   position: relative;
   cursor: pointer;
@@ -3556,5 +3569,19 @@ body[data-theme="black"] .landscape-install-btn {
 
   .landscape-banner-subtitle {
     display: none;
+  }
+}
+
+
+/* Mobile: avoid end-gaps + avoid over-scaling (JS also disables scaling on mobile) */
+@media (max-width: 900px) {
+  .piano-wrapper {
+    justify-content: flex-start;
+  }
+
+  .piano-keys-list {
+    width: max-content;
+    justify-content: flex-start;
+    transform-origin: left center;
   }
 }

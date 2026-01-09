@@ -66,36 +66,45 @@ keyElements.forEach((el) => {
 
 // keyboard scaling for responsive fitting
 function updateKeyboardScaling() {
+  const wrapper = document.querySelector(".piano-wrapper");
+  const list = document.querySelector(".piano-keys-list");
+  if (!wrapper || !list) return;
+
   const whiteKeys = Array.from(document.querySelectorAll(".key.white"));
   if (!whiteKeys.length) return;
-  const whiteKeyWidth = parseFloat(getComputedStyle(whiteKeys[0]).width);
-  const requiredWidth =
-    whiteKeyWidth * whiteKeys.length + (whiteKeys.length - 1) * 2; // gap 2px
-  const wrapper = document.querySelector(".piano-wrapper");
-  const containerWidth = wrapper.clientWidth - 20; // small padding
-  // Calculate width-based scale
-  const scaleWidth = containerWidth / requiredWidth;
-  // Calculate height-based scale using available app container space to avoid vertical scroll
-  const appContainer = document.querySelector(".app-container");
-  const headerH = document.querySelector(".synth-header")?.clientHeight || 0;
-  const visualH =
-    document.querySelector(".visual-dashboard")?.clientHeight || 0;
-  const dashboardH = document.querySelector(".dashboard")?.clientHeight || 0;
-  const paddingEstimate = 32; // small buffer for gaps/padding
-  const availableHeight =
-    (appContainer?.clientHeight || window.innerHeight) -
-    (headerH + visualH + dashboardH + paddingEstimate);
-  const whiteKeyHeight = parseFloat(getComputedStyle(whiteKeys[0]).height);
-  const scaleHeight =
-    availableHeight > 0 ? (availableHeight - 20) / whiteKeyHeight : 1;
-  const scale = Math.min(1, scaleWidth, scaleHeight);
-  const list = document.querySelector(".piano-keys-list");
-  if (list) {
-    list.style.transform = `scale(${scale})`;
-    // set wrapper height to scaled height so nothing overflows
-    wrapper.style.height = Math.max(whiteKeyHeight * scale + 40, 120) + "px";
+
+  // Mobile: do NOT scale the keyboard. Scaling made keys tiny and created
+  // trailing empty space in the wrapper; instead let CSS sizing handle it.
+  const isMobile = window.matchMedia("(max-width: 900px)").matches;
+  if (isMobile) {
+    list.style.transform = "";
+    list.style.width = "max-content";
+    wrapper.style.height = "";
+    resizeVisualizerCanvas();
+    return;
   }
-  // update visualizer size to match the new layout
+
+  // Desktop/tablet: scale only by width using the real rendered width.
+  // This avoids hard-coded padding guesses and avoids height-based scaling.
+  list.style.transform = "";
+  list.style.width = "max-content";
+
+  const wrapperStyles = getComputedStyle(wrapper);
+  const paddingLeft = parseFloat(wrapperStyles.paddingLeft) || 0;
+  const paddingRight = parseFloat(wrapperStyles.paddingRight) || 0;
+  const containerWidth = Math.max(
+    0,
+    wrapper.clientWidth - paddingLeft - paddingRight
+  );
+
+  const requiredWidth = list.scrollWidth;
+  const scaleWidth = requiredWidth > 0 ? containerWidth / requiredWidth : 1;
+  const scale = Math.min(1, scaleWidth);
+
+  // Lock base width so scaling results in an exact fit (no end-gap)
+  list.style.width = requiredWidth + "px";
+  list.style.transform = `scale(${scale})`;
+
   resizeVisualizerCanvas();
 }
 
@@ -892,8 +901,10 @@ window.setTheme = function (themeName) {
 // ==============================================
 (function initExitSharePrompt() {
   const EXIT_STORAGE_KEY = "kingsonicpro_exit_share_shown";
-  const MIN_SESSION_TIME = 30000; // 30 seconds minimum before showing
-  const MIN_NOTES_PLAYED = 5; // Minimum notes to be considered engaged
+  // Make this prompt more likely to appear on real "exit" attempts.
+  // The previous thresholds were too strict for many mobile sessions.
+  const MIN_SESSION_TIME = 15000; // 15 seconds minimum before showing
+  const MIN_NOTES_PLAYED = 1; // At least one note played
 
   // Session tracking
   let sessionStartTime = Date.now();
@@ -1103,17 +1114,25 @@ window.setTheme = function (themeName) {
 
   // 4. Mobile: Detect back button (popstate)
   window.addEventListener("popstate", (e) => {
+    // If the user tries to go back/close, show prompt (if engaged) and keep them in-app.
     if (!exitPromptShown && isUserEngaged()) {
-      e.preventDefault();
       showExitPrompt();
-      // Re-push state to prevent actual navigation
-      history.pushState(null, "", window.location.href);
+      try {
+        history.pushState({ __kspExitShare: true }, "", window.location.href);
+      } catch (err) {
+        /* ignore */
+      }
     }
   });
 
-  // Push initial state for popstate detection
-  if (history.state === null) {
-    history.pushState(null, "", window.location.href);
+  // Push a sentinel state for popstate detection.
+  // Some browsers set a non-null initial state, so check for our marker.
+  try {
+    if (!history.state || history.state.__kspExitShare !== true) {
+      history.pushState({ __kspExitShare: true }, "", window.location.href);
+    }
+  } catch (err) {
+    /* ignore */
   }
 
   // Escape key to close
