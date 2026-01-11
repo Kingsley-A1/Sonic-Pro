@@ -437,12 +437,19 @@ canvas {
 .dashboard {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 16px;
   margin-bottom: 25px;
   background: #222;
   padding: 15px;
   border-radius: 12px;
   align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.control-group {
+  flex: 1 1 auto;
+  min-width: fit-content;
 }
 
 .control-group label {
@@ -751,10 +758,8 @@ input[type="range"] {
   padding: 10px 4px;
   border-radius: 8px;
   box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.8);
-  overflow-x: auto;
-  /* allow horizontal scrolling for wide keyboards */
-  overflow-y: auto;
-  /* in case we need a fallback vertical scroll */
+  overflow: hidden;
+  /* No scrolling - all keys must fit in viewport */
   height: 100%;
   /* fill the grid row height */
   width: 100%;
@@ -765,28 +770,44 @@ input[type="range"] {
   display: flex;
   list-style: none;
   position: relative;
-  transition: transform 220ms ease;
-  transform-origin: center center;
-  /* center the keyboard visually when scaled */
   justify-content: center;
   width: 100%;
-  /* stretch to fill available space */
+  /* Keys will fill available space */
 }
 
-/* Mobile: avoid end-gaps + avoid over-scaling (JS also disables scaling on mobile) */
+/* Mobile: Keys fit to viewport - NO SCROLLING */
 @media (max-width: 900px) {
   .piano-wrapper {
-    justify-content: flex-start;
-    overflow-y: visible;
-    min-height: calc(var(--white-key-height) + 24px);
+    justify-content: center;
+    overflow: hidden;
+    min-height: calc(var(--white-key-height) + 16px);
+    padding: 8px 2px;
   }
 
   .piano-keys-list {
-    width: max-content;
-    justify-content: flex-start;
-    transform-origin: left center;
+    width: 100%;
+    justify-content: center;
+    gap: 0;
+  }
+
+  /* Dynamic key sizing: 13 white keys must fit in available width */
+  /* Available width = 100vw - app container margin (4px*2) - wrapper padding (2px*2) - app padding (varies) */
+  .key.white {
+    width: calc((100vw - 24px) / 13);
+    max-width: 58px;
+    min-width: 28px;
+    flex-shrink: 0;
+  }
+
+  .key.black {
+    width: calc(((100vw - 24px) / 13) * 0.65);
+    max-width: 38px;
+    min-width: 18px;
+    margin: 0 calc(((100vw - 24px) / 13) * -0.325);
+    flex-shrink: 0;
   }
 }
+
 
 .key {
   position: relative;
@@ -1408,18 +1429,15 @@ input[disabled] {
   }
 }
 
-/* Portrait Orientation Handling */
+/* Portrait Orientation Handling - Rotate overlay will block this, but ensure no scrolling as backup */
 @media (orientation: portrait) and (max-width: 700px) {
   :root {
-    --white-key-width: 46px;
     --white-key-height: 160px;
-    --black-key-width: 30px;
     --black-key-height: 96px;
   }
 
   .piano-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
   }
 }
 
@@ -1441,42 +1459,207 @@ input[disabled] {
   }
 }
 
-/* Landscape Mode Optimization for Mobile */
-@media (orientation: landscape) and (max-height: 500px) {
+/* ========================================
+   MOBILE LANDSCAPE - COMPACT CONTROLS & MAXIMIZE KEYS
+   ======================================== */
+@media (orientation: landscape) and (max-height: 600px) {
   .app-container {
-    padding: 6px 10px;
-    gap: 4px;
-  }
-
-  .synth-header {
-    margin-bottom: 4px;
-    padding-bottom: 4px;
-  }
-
-  .visual-dashboard {
-    min-height: 40px;
-    max-height: 20vh;
-  }
-
-  .dashboard {
-    padding: 6px 8px;
-    gap: 8px;
-    margin-bottom: 4px;
-  }
-}
-
-@media (orientation: landscape) and (max-height: 400px) {
-  .visual-dashboard {
-    display: none;
-  }
-
-  .dashboard {
-    margin-bottom: 4px;
+    padding: 4px 8px;
+    gap: 3px;
+    max-height: 100vh;
   }
 
   .synth-header {
     margin-bottom: 2px;
     padding-bottom: 2px;
+  }
+
+  .brand-name {
+    font-size: 0.9rem;
+  }
+
+  .dot {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Compact visual dashboard */
+  .visual-dashboard {
+    min-height: 36px;
+    max-height: 15vh;
+    padding: 4px 6px;
+    gap: 6px;
+  }
+
+  .visual-dashboard .viz-left,
+  .visual-dashboard .viz-right {
+    padding: 4px 6px;
+    min-width: 50px;
+  }
+
+  .pressed-key-letter {
+    font-size: 1.2rem;
+  }
+
+  .pressed-key-note {
+    font-size: 0.6rem;
+  }
+
+  #record-status {
+    font-size: 0.55rem;
+  }
+
+  #record-timer {
+    font-size: 0.5rem;
+  }
+
+  /* COMPACT DASHBOARD - All controls distributed evenly */
+  .dashboard {
+    padding: 4px 8px;
+    gap: 8px;
+    margin-bottom: 2px;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .control-group {
+    flex: 0 1 auto;
+    min-width: auto;
+  }
+
+  .control-group label {
+    font-size: 0.5rem;
+    margin-bottom: 2px;
+  }
+
+  /* Compact tone buttons */
+  .toggle-switch {
+    padding: 1px;
+    gap: 1px;
+  }
+
+  .tone-btn {
+    padding: 3px 5px;
+    font-size: 0.55rem;
+    min-height: 24px;
+  }
+
+  /* Compact octave controls */
+  .octave-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 0.7rem;
+  }
+
+  #octave-display {
+    width: 26px;
+    font-size: 0.6rem;
+  }
+
+  /* Compact power controls */
+  .power-btn {
+    padding: 3px 8px;
+    font-size: 0.55rem;
+    min-height: 22px;
+    min-width: 32px;
+  }
+
+  .power-indicator {
+    width: 7px;
+    height: 7px;
+  }
+
+  /* Compact record controls */
+  .record-btn-pro {
+    width: 32px;
+    height: 32px;
+  }
+
+  .record-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .stop-btn-pro {
+    width: 28px;
+    height: 28px;
+  }
+
+  .stop-icon {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* Compact mic controls */
+  .mic-btn {
+    padding: 3px 6px;
+    font-size: 0.5rem;
+    min-height: 22px;
+  }
+
+  .mic-indicator {
+    width: 6px;
+    height: 6px;
+  }
+
+  /* Compact speed control */
+  .speed-control {
+    min-width: 60px;
+  }
+
+  .speed-controls {
+    gap: 4px;
+  }
+
+  #speed-slider {
+    width: 50px;
+    height: 4px;
+  }
+
+  #speed-display {
+    font-size: 0.5rem;
+  }
+
+  /* Volume slider compact */
+  #volume-slider {
+    width: 60px;
+    height: 4px;
+  }
+
+  /* Piano wrapper - maximize height */
+  .piano-wrapper {
+    padding: 6px 2px;
+    flex-grow: 1;
+    min-height: 0;
+  }
+
+  /* Key heights for landscape */
+  :root {
+    --white-key-height: calc(100vh - 160px);
+    --black-key-height: calc((100vh - 160px) * 0.6);
+  }
+}
+
+/* Even smaller heights - hide visual dashboard entirely */
+@media (orientation: landscape) and (max-height: 450px) {
+  .visual-dashboard {
+    display: none;
+  }
+
+  .synth-header {
+    margin-bottom: 1px;
+    padding-bottom: 1px;
+  }
+
+  .dashboard {
+    margin-bottom: 1px;
+    padding: 3px 6px;
+  }
+
+  :root {
+    --white-key-height: calc(100vh - 100px);
+    --black-key-height: calc((100vh - 100px) * 0.6);
   }
 }
 

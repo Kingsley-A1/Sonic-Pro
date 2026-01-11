@@ -73,15 +73,14 @@ function updateKeyboardScaling() {
   const whiteKeys = Array.from(document.querySelectorAll(".key.white"));
   if (!whiteKeys.length) return;
 
-  // Mobile: do NOT scale the keyboard. Scaling made keys tiny and created
-  // trailing empty space in the wrapper; instead let CSS sizing handle it.
+  // Mobile: Let CSS handle the responsive sizing with viewport-based calculations
+  // CSS uses calc((100vw - 24px) / 13) for white keys to fit all 13 in viewport
   const isMobile = window.matchMedia("(max-width: 900px)").matches;
   if (isMobile) {
+    // Clear any JS transforms - CSS handles everything
     list.style.transform = "";
-    list.style.width = "max-content";
-    const whiteKeyHeight = parseFloat(getComputedStyle(whiteKeys[0]).height);
-    // Ensure the wrapper is tall enough so labels are not clipped.
-    wrapper.style.minHeight = Math.max(whiteKeyHeight + 18, 140) + "px";
+    list.style.width = "";
+    wrapper.style.minHeight = "";
     wrapper.style.height = "";
     resizeVisualizerCanvas();
     return;
@@ -541,6 +540,24 @@ const ENVELOPE_SETTINGS = {
     sustainLevel: 0.8,
     release: 2.5,
   },
+  flute: {
+    // Flute - breathy with vibrato
+    attack: 0.08, // Slower attack like breath
+    decay: 0.1,
+    sustainLevel: 0.75,
+    release: 0.8,
+    vibrato: true, // Special flag for vibrato
+    vibratoRate: 5.5, // Hz
+    vibratoDepth: 8, // cents
+  },
+  drum: {
+    // Drum - percussive noise burst
+    attack: 0.001, // Instant attack
+    decay: 0.05, // Very fast decay
+    sustainLevel: 0.0, // No sustain
+    release: 0.15, // Quick release
+    isNoise: true, // Special flag for noise-based sound
+  },
 };
 
 // Start playing a note (called on key down)
@@ -558,16 +575,6 @@ function startNote(noteName, octaveShift = 0) {
     stopNote(noteName, octaveShift, true); // Quick stop for re-trigger
   }
 
-  const oscillator = audioCtx.createOscillator();
-  const noteGain = audioCtx.createGain();
-  let oscillator2 = null;
-
-  // Connect: Oscillator -> Note Gain -> Master Gain
-  oscillator.connect(noteGain);
-  noteGain.connect(masterGain);
-
-  oscillator.type = waveform;
-
   // Frequency Calculation
   let targetOctave = currentOctave + octaveShift;
   let fullNote = noteName + targetOctave;
@@ -578,7 +585,6 @@ function startNote(noteName, octaveShift = 0) {
     return;
   }
 
-  oscillator.frequency.value = frequency;
   const now = audioCtx.currentTime;
   const env = ENVELOPE_SETTINGS[waveform] || ENVELOPE_SETTINGS.triangle;
 
@@ -586,34 +592,113 @@ function startNote(noteName, octaveShift = 0) {
   const attackTime = env.attack / speedMultiplier;
   const decayTime = env.decay / speedMultiplier;
 
-  // ADSR Envelope - Attack & Decay phase
-  noteGain.gain.setValueAtTime(0, now);
-  noteGain.gain.linearRampToValueAtTime(masterVolume, now + attackTime);
-  noteGain.gain.linearRampToValueAtTime(
-    masterVolume * env.sustainLevel,
-    now + attackTime + decayTime
-  );
+  const noteGain = audioCtx.createGain();
+  noteGain.connect(masterGain);
 
-  oscillator.start(now);
+  let oscillator = null;
+  let oscillator2 = null;
+  let lfo = null;
+  let noiseSource = null;
+  let noiseFilter = null;
 
-  // Add second oscillator for richer synth/square tones
-  if (waveform === "sawtooth" || waveform === "square") {
-    oscillator2 = audioCtx.createOscillator();
-    oscillator2.type = waveform;
-    oscillator2.frequency.value = frequency;
-    try {
-      oscillator2.detune.value = 8;
-    } catch (e) {
-      /* ignore */
+  // DRUM: Use noise burst with pitched filter
+  if (waveform === "drum" || env.isNoise) {
+    // Create noise buffer
+    const bufferSize = audioCtx.sampleRate * 0.3; // 300ms of noise
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
     }
-    oscillator2.connect(noteGain);
-    oscillator2.start(now);
+
+    noiseSource = audioCtx.createBufferSource();
+    noiseSource.buffer = noiseBuffer;
+
+    // Create bandpass filter tuned to the note frequency for pitched drums
+    noiseFilter = audioCtx.createBiquadFilter();
+    noiseFilter.type = "bandpass";
+    noiseFilter.frequency.value = frequency;
+    noiseFilter.Q.value = 5; // Resonance
+
+    noiseSource.connect(noiseFilter);
+    noiseFilter.connect(noteGain);
+
+    // Very fast envelope for percussive hit
+    noteGain.gain.setValueAtTime(0, now);
+    noteGain.gain.linearRampToValueAtTime(masterVolume * 1.2, now + attackTime);
+    noteGain.gain.exponentialRampToValueAtTime(0.001, now + attackTime + 0.15);
+
+    noiseSource.start(now);
+    noiseSource.stop(now + 0.3);
+
+  // FLUTE: Use sine wave with vibrato LFO
+  } else if (waveform === "flute" || env.vibrato) {
+    oscillator = audioCtx.createOscillator();
+    oscillator.type = "sine"; // Pure sine for flute
+    oscillator.frequency.value = frequency;
+
+    // Create LFO for vibrato
+    lfo = audioCtx.createOscillator();
+    const lfoGain = audioCtx.createGain();
+    lfo.type = "sine";
+    lfo.frequency.value = env.vibratoRate || 5.5;
+    lfoGain.gain.value = env.vibratoDepth || 8; // Vibrato depth in cents
+
+    lfo.connect(lfoGain);
+    lfoGain.connect(oscillator.detune);
+
+    oscillator.connect(noteGain);
+
+    // Breath-like envelope
+    noteGain.gain.setValueAtTime(0, now);
+    noteGain.gain.linearRampToValueAtTime(masterVolume * 0.8, now + attackTime);
+    noteGain.gain.linearRampToValueAtTime(
+      masterVolume * env.sustainLevel,
+      now + attackTime + decayTime
+    );
+
+    oscillator.start(now);
+    lfo.start(now);
+
+  // STANDARD WAVEFORMS
+  } else {
+    oscillator = audioCtx.createOscillator();
+    oscillator.type = waveform;
+    oscillator.frequency.value = frequency;
+
+    oscillator.connect(noteGain);
+
+    // Standard ADSR Envelope
+    noteGain.gain.setValueAtTime(0, now);
+    noteGain.gain.linearRampToValueAtTime(masterVolume, now + attackTime);
+    noteGain.gain.linearRampToValueAtTime(
+      masterVolume * env.sustainLevel,
+      now + attackTime + decayTime
+    );
+
+    oscillator.start(now);
+
+    // Add second oscillator for richer synth/square tones
+    if (waveform === "sawtooth" || waveform === "square") {
+      oscillator2 = audioCtx.createOscillator();
+      oscillator2.type = waveform;
+      oscillator2.frequency.value = frequency;
+      try {
+        oscillator2.detune.value = 8;
+      } catch (e) {
+        /* ignore */
+      }
+      oscillator2.connect(noteGain);
+      oscillator2.start(now);
+    }
   }
 
   // Store active note data for release on key up
   activeNotes.set(noteId, {
     oscillator,
     oscillator2,
+    lfo,
+    noiseSource,
     noteGain,
     startTime: now,
     envelope: env,
@@ -627,7 +712,7 @@ function stopNote(noteName, octaveShift = 0, quick = false) {
 
   if (!noteData) return;
 
-  const { oscillator, oscillator2, noteGain, envelope } = noteData;
+  const { oscillator, oscillator2, lfo, noiseSource, noteGain, envelope } = noteData;
   const now = audioCtx.currentTime;
 
   // Release phase - use quick release if re-triggering, else full release
@@ -639,11 +724,18 @@ function stopNote(noteName, octaveShift = 0, quick = false) {
   noteGain.gain.setValueAtTime(noteGain.gain.value, now);
   noteGain.gain.exponentialRampToValueAtTime(0.001, now + releaseTime);
 
-  // Schedule oscillator stop after release
-  oscillator.stop(now + releaseTime + 0.1);
+  // Schedule oscillator stop after release (only if exists)
+  if (oscillator) {
+    oscillator.stop(now + releaseTime + 0.1);
+  }
   if (oscillator2) {
     oscillator2.stop(now + releaseTime + 0.1);
   }
+  // Stop LFO for flute vibrato
+  if (lfo) {
+    lfo.stop(now + releaseTime + 0.1);
+  }
+  // Note: noiseSource auto-stops, no action needed
 
   // Remove from active notes
   activeNotes.delete(noteId);
@@ -1327,11 +1419,109 @@ document.addEventListener("mouseup", () => {
   });
 });
 
-// Touch event handlers for mobile (with multi-touch support)
+// ==============================================
+// GLISSANDO & MULTI-TOUCH SLIDING SUPPORT
+// ==============================================
+
+// Track which key each touch point is currently over
+const touchKeyMap = new Map();
+
+// Get the piano key element at a given screen coordinate
+function getKeyAtPoint(clientX, clientY) {
+  const element = document.elementFromPoint(clientX, clientY);
+  if (!element) return null;
+  
+  // Check if it's a key or a child of a key (like the span label)
+  if (element.classList.contains('key')) {
+    return element;
+  }
+  const parent = element.closest('.key');
+  return parent;
+}
+
+// Handle a single touch point - trigger note if on new key
+function handleTouchPoint(touch) {
+  if (!pianoEnabled) return;
+  
+  const touchId = touch.identifier;
+  const currentKey = getKeyAtPoint(touch.clientX, touch.clientY);
+  const previousKey = touchKeyMap.get(touchId);
+  
+  // If we're on the same key, do nothing
+  if (currentKey === previousKey) return;
+  
+  // Release the previous key if we were on one
+  if (previousKey && previousKey.classList.contains('key')) {
+    keyUp(previousKey);
+  }
+  
+  // Play the new key if we're on one
+  if (currentKey && currentKey.classList.contains('key')) {
+    keyDown(currentKey);
+    touchKeyMap.set(touchId, currentKey);
+  } else {
+    // Finger moved off all keys
+    touchKeyMap.delete(touchId);
+  }
+}
+
+// Clean up when a touch ends
+function handleTouchEnd(touch) {
+  const touchId = touch.identifier;
+  const currentKey = touchKeyMap.get(touchId);
+  
+  if (currentKey && currentKey.classList.contains('key')) {
+    keyUp(currentKey);
+  }
+  touchKeyMap.delete(touchId);
+}
+
+// Piano wrapper touch event listeners for glissando
+const pianoWrapper = document.querySelector('.piano-wrapper');
+if (pianoWrapper) {
+  // Touch start - begin tracking touches
+  pianoWrapper.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (!orientationLockTried) tryLockLandscape();
+    
+    Array.from(e.changedTouches).forEach(touch => {
+      handleTouchPoint(touch);
+    });
+  }, { passive: false });
+  
+  // Touch move - the key to glissando! Handle sliding across keys
+  pianoWrapper.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    
+    Array.from(e.changedTouches).forEach(touch => {
+      handleTouchPoint(touch);
+    });
+  }, { passive: false });
+  
+  // Touch end - release notes
+  pianoWrapper.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    
+    Array.from(e.changedTouches).forEach(touch => {
+      handleTouchEnd(touch);
+    });
+  }, { passive: false });
+  
+  // Touch cancel - clean up
+  pianoWrapper.addEventListener('touchcancel', (e) => {
+    Array.from(e.changedTouches).forEach(touch => {
+      handleTouchEnd(touch);
+    });
+  }, { passive: false });
+}
+
+// Also handle individual key touch events as fallback
 document.querySelectorAll(".key").forEach((key) => {
   key.addEventListener(
     "touchstart",
     (e) => {
+      // Only handle if pianoWrapper handler didn't already
+      if (e.defaultPrevented) return;
       e.preventDefault();
       keyDown(key);
     },
@@ -1341,6 +1531,7 @@ document.querySelectorAll(".key").forEach((key) => {
   key.addEventListener(
     "touchend",
     (e) => {
+      if (e.defaultPrevented) return;
       e.preventDefault();
       keyUp(key);
     },

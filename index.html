@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
     />
-    <title>KING SON♪C Pro - Premium Piano & Synthesizer</title>
+    <title>SONIC PIANO - Premium Piano & Synthesizer</title>
 
     <!-- Preload critical resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,11 +24,11 @@
     <meta name="robots" content="index, follow" />
     <meta
       name="description"
-      content="KING SON♪C Pro - A premium web synthesizer and piano application with multiple tones, recording capabilities, and beautiful visualizations. Play anywhere, works offline!"
+      content="SONIC PIANO - A premium web synthesizer and piano application with multiple tones, recording capabilities, and beautiful visualizations. Play anywhere, works offline!"
     />
     <meta
       name="keywords"
-      content="piano, synthesizer, web app, music, PWA, keyboard, virtual piano, music production, audio, KING SONIC Pro"
+      content="piano, synthesizer, web app, music, PWA, keyboard, virtual piano, music production, audio, SONIC PIANO"
     />
     <meta name="author" content="Kingsley" />
 
@@ -40,7 +40,7 @@
     />
     <meta
       property="og:title"
-      content="KING SON♪C Pro - Premium Mobile Piano & Synthesizer"
+      content="SONIC PIANO - Premium Mobile Piano & Synthesizer"
     />
     <meta
       property="og:description"
@@ -59,13 +59,13 @@
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!"
+      content="SONIC PIANO - Premium Performance • Play Anywhere"
     />
-    <meta property="og:site_name" content="KING SON♪C Pro" />
+    <meta property="og:site_name" content="SONIC PIANO" />
     <meta property="og:locale" content="en_US" />
 
     <!-- WhatsApp Specific - optimized JPEG under 300KB (109KB) -->
-    <meta itemprop="name" content="KING SON♪C Pro - Premium Mobile Piano" />
+    <meta itemprop="name" content="SONIC PIANO - Premium Mobile Piano" />
     <meta
       itemprop="description"
       content="Premium Performance • Built with Passion • Built For You! "
@@ -81,7 +81,7 @@
     <meta name="twitter:creator" content="@kingsley_a1" />
     <meta
       name="twitter:title"
-      content="KING SON♪C Pro - Premium Mobile Piano & Synthesizer"
+      content="SONIC PIANO - Premium Mobile Piano & Synthesizer"
     />
     <meta
       name="twitter:description"
@@ -93,12 +93,12 @@
     />
     <meta
       name="twitter:image:alt"
-      content="KING SON♪C Pro - Premium Performance • Built with Passion • Built For You!"
+      content="SONIC PIANO - Premium Performance • Play Anywhere"
     />
 
     <!-- Additional PWA & Mobile Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="application-name" content="SonicPro" />
+    <meta name="application-name" content="SONIC PIANO" />
     <meta name="msapplication-TileColor" content="#ff6b35" />
     <meta name="msapplication-TileImage" content="icons/icon-144x144.png" />
     <meta name="format-detection" content="telephone=no" />
@@ -109,7 +109,7 @@
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
-    <meta name="apple-mobile-web-app-title" content="SonicPro" />
+    <meta name="apple-mobile-web-app-title" content="SONIC PIANO" />
     <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
     <link
       rel="apple-touch-icon"
@@ -172,7 +172,7 @@
     <div class="app-container">
       <header class="synth-header">
         <div class="logo-container">
-          <h1 class="brand-name">KING SON♪C <span class="accent">Pro</span></h1>
+          <h1 class="brand-name">SONIC <span class="accent">PIANO</span></h1>
         </div>
 
         <div class="theme-selector">
@@ -206,7 +206,7 @@
             aria-live="polite"
           >
             <span>Welcome to</span>
-            <span>KING SON♪C Pro</span>
+            <span>SONIC PIANO</span>
           </div>
         </div>
         <div class="viz-right">
@@ -237,6 +237,8 @@
             <button class="tone-btn" data-type="sawtooth">Synth</button>
             <button class="tone-btn" data-type="square">Square</button>
             <button class="tone-btn" data-type="sine">Sine</button>
+            <button class="tone-btn" data-type="flute">Flute</button>
+            <button class="tone-btn" data-type="drum">Drum</button>
           </div>
         </div>
 
@@ -516,7 +518,7 @@
         <!-- State: Prompt (default) -->
         <div class="install-state" id="install-state-prompt">
           <div class="install-card-icon">
-            <img src="icons/icon-96x96.png" alt="King Sonic Pro" />
+            <img src="icons/icon-96x96.png" alt="SONIC PIANO" />
             <div class="install-icon-glow"></div>
           </div>
           <div class="install-card-header">
@@ -1061,18 +1063,50 @@
           showInstallSuccess();
         });
 
-        // AGGRESSIVE IMMEDIATE SHOW: fire right after JS is ready (no delay)
-        setTimeout(() => {
-          if (!isInstalled() && !isCardDismissed()) {
-            if (isIOS()) {
-              console.log("📲 iOS detected - showing install card IMMEDIATELY");
-              showInstallCard();
-            } else {
-              console.log("📲 Showing install card AGGRESSIVELY on load");
-              showInstallCard();
-            }
+        // IMMEDIATE SHOW STRATEGY: Show install prompt as soon as page loads
+        // This runs after all resources (images, CSS) are loaded
+        const triggerInstallPrompt = () => {
+          if (isInstalled()) {
+            console.log("📲 Already installed - skipping install prompt");
+            return;
           }
-        }, 0);
+
+          // On FIRST VISIT ever, show immediately regardless of dismiss
+          const hasSeenBefore = localStorage.getItem("installPromptSeen");
+          
+          if (!hasSeenBefore) {
+            console.log("📲 FIRST VISIT - showing install prompt IMMEDIATELY");
+            localStorage.setItem("installPromptSeen", "true");
+            showInstallCard();
+            return;
+          }
+
+          // For returning visitors, respect dismiss but be less strict
+          if (!isCardDismissed()) {
+            console.log("📲 Returning visitor - showing install prompt");
+            showInstallCard();
+          } else {
+            console.log("📲 Install prompt recently dismissed - respecting user choice");
+          }
+        };
+
+        // Trigger on window load (all resources loaded)
+        if (document.readyState === "complete") {
+          // Page already loaded
+          setTimeout(triggerInstallPrompt, 100);
+        } else {
+          // Wait for full page load
+          window.addEventListener("load", () => {
+            setTimeout(triggerInstallPrompt, 100);
+          });
+        }
+
+        // Also handle pageshow for back/forward cache
+        window.addEventListener("pageshow", (e) => {
+          if (e.persisted && !isInstalled() && !isCardDismissed()) {
+            setTimeout(triggerInstallPrompt, 200);
+          }
+        });
 
         // Re-engage the prompt after swipe-to-close or app switching: when the
         // page becomes visible again (e.g., user aborted a swipe/gesture), re-show

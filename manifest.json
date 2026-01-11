@@ -1,6 +1,6 @@
 {
-  "name": "KING SON♪C Pro",
-  "short_name": "SON♪C Pro",
+  "name": "SONIC PIANO",
+  "short_name": "SONIC PIANO",
   "id": "com.kingsley.king-sonic-pro-2026",
   "description": "A premium sound synthesizer and piano application with multiple tones, recording capabilities, and beautiful visualizations. Play anywhere, works offline!",
   "start_url": "./index.html",
@@ -92,7 +92,7 @@
       "sizes": "1200x630",
       "type": "image/jpeg",
       "form_factor": "wide",
-      "label": "KING SON♪C Pro - Premium Web Synthesizer"
+      "label": "SONIC PIANO - Premium Web Synthesizer"
     }
   ],
   "categories": ["entertainment", "music", "utilities"],
