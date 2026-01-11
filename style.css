@@ -781,7 +781,7 @@ input[type="range"] {
     justify-content: center;
     overflow: hidden;
     min-height: calc(var(--white-key-height) + 16px);
-    padding: 8px 2px;
+    padding: 6px 2px;
   }
 
   .piano-keys-list {
@@ -790,21 +790,37 @@ input[type="range"] {
     gap: 0;
   }
 
-  /* Dynamic key sizing: 13 white keys must fit in available width */
-  /* Available width = 100vw - app container margin (4px*2) - wrapper padding (2px*2) - app padding (varies) */
+  /* Dynamic key sizing: 15 white keys must fit in available width */
+  /* Available width = 100vw - safe margins (16px total) */
   .key.white {
-    width: calc((100vw - 24px) / 13);
-    max-width: 58px;
-    min-width: 28px;
+    width: calc((100vw - 16px) / 15);
+    max-width: 50px;
+    min-width: 20px;
     flex-shrink: 0;
   }
 
   .key.black {
-    width: calc(((100vw - 24px) / 13) * 0.65);
-    max-width: 38px;
-    min-width: 18px;
-    margin: 0 calc(((100vw - 24px) / 13) * -0.325);
+    width: calc(((100vw - 16px) / 15) * 0.6);
+    max-width: 32px;
+    min-width: 12px;
+    margin: 0 calc(((100vw - 16px) / 15) * -0.3);
     flex-shrink: 0;
+  }
+
+  /* Make key text labels visible on mobile */
+  .key.white span {
+    font-size: clamp(0.45rem, calc((100vw - 16px) / 15 * 0.22), 0.7rem);
+    padding-bottom: 4px;
+    color: #333;
+    font-weight: 700;
+    text-shadow: none;
+  }
+
+  .key.black span {
+    font-size: clamp(0.35rem, calc((100vw - 16px) / 15 * 0.18), 0.55rem);
+    padding-bottom: 3px;
+    color: #999;
+    font-weight: 600;
   }
 }
 
